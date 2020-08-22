@@ -1,6 +1,6 @@
 {
     "name": "mario",
-    "displayName": "Mario: The Block Jumper Extension",
+    "displayName": "Mario: The Mario Extension",
     "description": "Cursor movement for speedrunners and pros",
     "version": "1.0.0",
     "publisher": "jeff-hykin",
@@ -11,6 +11,15 @@
     "engines": {
         "vscode": "^1.5.0"
     },
+    "keywords": [
+        "jumper",
+        "jumpy",
+        "cursor",
+        "block",
+        "jump",
+        "navigate",
+        "code"
+    ],
     "categories": [
         "Other"
     ],
@@ -26,23 +35,23 @@
         "commands": [
             {
                 "command": "mario.moveUp",
-                "title": "Space Block Jumper: Move Up"
+                "title": "Mario: Move Up"
             },
             {
                 "command": "mario.moveDown",
-                "title": "Space Block Jumper: Move Down"
+                "title": "Mario: Move Down"
             },
             {
                 "command": "mario.moveToOuter",
-                "title": "Block Jumper: Move To Outer Block"
+                "title": "Mario: Move To Outer Block"
             },
             {
                 "command": "mario.moveDownToInner",
-                "title": "Block Jumper: Move Down To Inner"
+                "title": "Mario: Move Down To Inner"
             },
             {
                 "command": "mario.moveUpToInner",
-                "title": "Block Jumper: Move Up To Inner"
+                "title": "Mario: Move Up To Inner"
             }
         ]
     },
