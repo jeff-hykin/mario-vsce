@@ -2,7 +2,7 @@
     "name": "mario",
     "displayName": "Mario: The Mario Extension",
     "description": "Cursor movement for speedrunners and pros",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "publisher": "jeff-hykin",
     "repository": {
         "type": "git",
