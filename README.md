@@ -22,13 +22,13 @@ Ever use Inspect Element on your browser, and navigate the elements using your a
         "when": "editorTextFocus"
     },
     {
-        "key": "alt+shift+s",
-        "command": "mario.moveDown",
+        "key": "alt+shift+a",
+        "command": "mario.moveToOuter",
         "when": "editorTextFocus"
     },
     {
-        "key": "alt+shift+a",
-        "command": "mario.moveToOuter",
+        "key": "alt+shift+s",
+        "command": "mario.moveDown",
         "when": "editorTextFocus"
     },
     {
