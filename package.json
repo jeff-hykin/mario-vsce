@@ -2,7 +2,7 @@
     "name": "mario",
     "displayName": "Mario: The Mario Extension",
     "description": "Cursor movement for speedrunners and pros",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "publisher": "jeff-hykin",
     "repository": {
         "type": "git",
@@ -30,7 +30,7 @@
         "onCommand:mario.moveDownToInner",
         "onCommand:mario.moveUpToInner"
     ],
-    "main": "./src/extension",
+    "main": "./src/extension.js",
     "contributes": {
         "commands": [
             {

@@ -109,7 +109,6 @@ function moveCursor({anchor, goUp, direction}) {
     let document = currentFile.editor.document
     let currentPosition = currentFile.editor.selection.active
     let lineIndexToJumpTo = currentPosition.line
-    console.debug(`about to get currentIndentLevel`)
     let currentIndentLevel = getApproxIndentLevel(currentPosition.line)
     let indentLevelOfNewLine = currentIndentLevel
     let hitAtLeastOneLineWithDifferentIndent = false
@@ -117,8 +116,6 @@ function moveCursor({anchor, goUp, direction}) {
     let startedOnBlankLine = line.isEmptyOrWhitespace
     var skippedBlankLines = false
     var indentLevelChanged = false
-    console.debug(`startingIndex is:`,lineIndexToJumpTo)
-    console.debug(`direction is:`,direction)
     switch (direction) {
                     
         // next line (up) with the same or smaller indent    
@@ -160,13 +157,11 @@ function moveCursor({anchor, goUp, direction}) {
                 
                 // skip blank lines
                 if (document.lineAt(lineIndexToJumpTo).isEmptyOrWhitespace) {
-                    console.debug(`Skipping blank line`)
                     skippedBlankLines = true
                     continue
                 }
                 // stop after skipping blank lines
                 if (skippedBlankLines && indentLevelOfNewLine <= currentIndentLevel) {
-                    console.debug(`indentLevelOfNewLine <= currentIndentLevel is:`,indentLevelOfNewLine <= currentIndentLevel)
                     break
                 }
                 
@@ -183,12 +178,10 @@ function moveCursor({anchor, goUp, direction}) {
                     let nextIndex = lineIndexToJumpTo+incrementor
                     if (currentFile.indexIsInBounds(nextIndex)) {
                         let blockStoppedByParent = getApproxIndentLevel(nextIndex) < indentLevelOfNewLine
-                        console.debug(`blockStoppedByParent? is:`,blockStoppedByParent)
                         if (blockStoppedByParent) {
                             break
                         }
                         let blockStoppedByBlankLines = document.lineAt(nextIndex).isEmptyOrWhitespace
-                        console.debug(`blockStoppedByBlankLines? is:`,blockStoppedByBlankLines)
                         if (blockStoppedByBlankLines) {
                             break
                         }
@@ -214,7 +207,6 @@ function moveCursor({anchor, goUp, direction}) {
 
         // next line (down) with a larger indent
         case "rightDown":
-            console.debug(`currentPosition.character < getCharacterIndexOfIndentFor(lineIndexToJumpTo) is:`,currentPosition.character < getCharacterIndexOfIndentFor(lineIndexToJumpTo))
             // if cursor isn't after the indent, move it there
             if (currentPosition.character < getCharacterIndexOfIndentFor(lineIndexToJumpTo)) {
                 break
@@ -240,7 +232,6 @@ function moveCursor({anchor, goUp, direction}) {
 
         // next line (up) with a larger indent
         case "rightUp":
-            console.debug(`currentPosition.character < getCharacterIndexOfIndentFor(lineIndexToJumpTo) is:`,currentPosition.character < getCharacterIndexOfIndentFor(lineIndexToJumpTo))
             // if cursor isn't after the indent, move it there
             if (currentPosition.character < getCharacterIndexOfIndentFor(lineIndexToJumpTo)) {
                 break
@@ -267,7 +258,6 @@ function moveCursor({anchor, goUp, direction}) {
     }
 
 
-    console.debug(`lineIndexToJumpTo is:`,lineIndexToJumpTo)
     const characterIndex = getCharacterIndexOfIndentFor(lineIndexToJumpTo)
     const active = currentFile.editor.selection.active.with(lineIndexToJumpTo, characterIndex)
     currentFile.editor.selection = new vscode.Selection(anchor || active, active)
@@ -278,11 +268,7 @@ module.exports = {
     activate(context) {
         context.subscriptions.push(
             vscode.commands.registerCommand("mario.moveUp", () => {
-                try {
-                    moveCursor({ direction: "up"})
-                } catch (error) {
-                    console.debug(`error is:`,error)
-                }
+                moveCursor({ direction: "up"})
             })
         )
 
