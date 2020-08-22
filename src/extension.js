@@ -177,8 +177,8 @@ function moveCursor({anchor, goUp, direction}) {
                     // look ahead for a signal that the block just ended
                     let nextIndex = lineIndexToJumpTo+incrementor
                     if (currentFile.indexIsInBounds(nextIndex)) {
-                        let blockStoppedByParent = getApproxIndentLevel(nextIndex) < indentLevelOfNewLine
-                        if (blockStoppedByParent) {
+                        let blockStoppedByParentOrChild = getApproxIndentLevel(nextIndex) != indentLevelOfNewLine
+                        if (blockStoppedByParentOrChild) {
                             break
                         }
                         let blockStoppedByBlankLines = document.lineAt(nextIndex).isEmptyOrWhitespace
