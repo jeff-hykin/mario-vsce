@@ -1,30 +1,14 @@
-# Space Block Jumper
+# Block Jumper (Mario)
 
-Space Block Jumper helps you navigate through space-delimited blocks.
+Tired of being an amateur using your mouse? Add this extension to your arsenal.
 
-![Demo](./demo.gif?raw=true "Demo")
+This extension works like W,A,S,D based on the blocks (indented or seperated by whitespace) of your code.
+Ever use Inspect Element on your browser, and navigate the elements using your arrow keys? This behaves similarly but for all code.
 
 ## Features
 
-* `mario.moveUp`: Move up a space block (often `ctrl+up`)
-* `mario.moveDown`: Move down a space block (often `ctrl+down`)
-* `mario.selectUp`: Select up a space block (often `shift+ctrl+up`)
-* `mario.selectDown`: Select down a space block (often `shift+ctrl+down`)
-
-## Known Issues
-
-None at this time.
-
-## Release Notes
-
-### 1.2.0
-
-Code cleanup
-
-### 1.1.0
-
-Minor
-
-### 1.0.0
-
-Initial release
+* `mario.mario.moveUp`: W: Move up a space block
+* `mario.mario.moveToOuter`: A:  Move left
+* `mario.mario.moveDown`: S: Move down a space block
+* `mario.mario.moveDownToInner`: D: Move right (down)
+* `mario.mario.moveUpToInner`: E: Move right (up)
