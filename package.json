@@ -1,0 +1,62 @@
+{
+    "name": "mario",
+    "displayName": "Mario: The Block Jumper Extension",
+    "description": "Cursor movement for speedrunners and pros",
+    "version": "1.2.2",
+    "publisher": "jeff-hykin",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jeff-hykin/mario-vsce.git"
+    },
+    "engines": {
+        "vscode": "^1.5.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:mario.moveUp",
+        "onCommand:mario.moveDown",
+        "onCommand:mario.moveToOuter",
+        "onCommand:mario.moveDownToInner",
+        "onCommand:mario.moveUpToInner"
+    ],
+    "main": "./src/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "mario.moveUp",
+                "title": "Space Block Jumper: Move Up"
+            },
+            {
+                "command": "mario.moveDown",
+                "title": "Space Block Jumper: Move Down"
+            },
+            {
+                "command": "mario.moveToOuter",
+                "title": "Block Jumper: Move To Outer Block"
+            },
+            {
+                "command": "mario.moveDownToInner",
+                "title": "Block Jumper: Move Down To Inner"
+            },
+            {
+                "command": "mario.moveUpToInner",
+                "title": "Block Jumper: Move Up To Inner"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "tsc -p ./",
+        "compile": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^2.0.3",
+        "vscode": "^1.0.0",
+        "mocha": "^2.3.3",
+        "@types/node": "^6.0.40",
+        "@types/mocha": "^2.2.32"
+    }
+}
