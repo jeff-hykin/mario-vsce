@@ -13,6 +13,31 @@ function anchorPosition(selection) {
     return selection.active.line === selection.end.line ? selection.start : selection.end
 }
 
+let getIndentAmount = (string) => {
+    let output = 0
+    // get all leading whitespace
+    let indentMatch = string.match(/^[ \t]+/)
+    if (!indentMatch) {
+        return output
+    }
+    let indent = indentMatch[0]
+    
+    // count & remove tabs
+    let tabsMatch = indent.match(/\t/g)
+    if (tabsMatch) {
+        output += tabsMatch.length
+        // remove the tabs
+        indent = indent.replace(/\t/g,"")
+    }
+    
+    // count spaces
+    let spacesMatch = indent.match(/ /g)
+    if (spacesMatch) {
+        output += Math.floor( spacesMatch.length / currentFile.tabSize)
+    }
+    return output
+}
+
 let getApproxIndentLevel = (lineIndex) => {
     if (currentFile.lineIndentCache[lineIndex] != null) {
         return currentFile.lineIndentCache[lineIndex]
@@ -63,36 +88,9 @@ let getApproxIndentLevel = (lineIndex) => {
         return currentFile.lineIndentCache[lineIndex] = Math.max(...results)
     }
 
-    // 
     // if its a normal uncached line:
-    // 
-    let string = line.text
-
-    let output = 0
-    // get all leading whitespace
-    let indentMatch = string.match(/^[ \t]+/)
-    if (!indentMatch) {
-        return output
-    }
-    let indent = indentMatch[0]
-    
-    // count & remove tabs
-    let tabsMatch = indent.match(/\t/g)
-    if (tabsMatch) {
-        output += tabsMatch.length
-        // remove the tabs
-        indent = indent.replace(/\t/g,"")
-    }
-    
-    // count spaces
-    let spacesMatch = indent.match(/ /g)
-    if (spacesMatch) {
-        output += Math.floor( spacesMatch.length / currentFile.tabSize)
-    }
-    
     // cache the result
-    currentFile.lineIndentCache[lineIndex] = output
-    return output
+    return currentFile.lineIndentCache[lineIndex] = getIndentAmount(line.text)
 }
 
 function moveCursor({anchor, goUp, direction}) {
@@ -109,7 +107,7 @@ function moveCursor({anchor, goUp, direction}) {
     let document = currentFile.editor.document
     let currentPosition = currentFile.editor.selection.active
     let lineIndexToJumpTo = currentPosition.line
-    let currentIndentLevel = getApproxIndentLevel(currentPosition.line)
+    var currentIndentLevel = getApproxIndentLevel(currentPosition.line)
     let indentLevelOfNewLine = currentIndentLevel
     let hitAtLeastOneLineWithDifferentIndent = false
     let line = document.lineAt(currentPosition.line)
@@ -144,6 +142,7 @@ function moveCursor({anchor, goUp, direction}) {
             // 7.        blah blah
             // 8.  blah
             let incrementor = direction == "up" ? -1 : 1
+            let baselineLevel = getIndentAmount(line.text.slice(0, currentFile.editor.selection.start.character))
             while (currentFile.indexIsInBounds(lineIndexToJumpTo+incrementor)) {
                 // go up or down the line index
                 lineIndexToJumpTo += incrementor
@@ -151,7 +150,7 @@ function moveCursor({anchor, goUp, direction}) {
                 indentLevelOfNewLine = getApproxIndentLevel(lineIndexToJumpTo)
                 
                 // stop if the next line is un-indented
-                if (indentLevelOfNewLine < currentIndentLevel) {
+                if (indentLevelOfNewLine < baselineLevel) {
                     break
                 }
                 
@@ -161,15 +160,15 @@ function moveCursor({anchor, goUp, direction}) {
                     continue
                 }
                 // stop after skipping blank lines
-                if (skippedBlankLines && indentLevelOfNewLine <= currentIndentLevel) {
+                if (skippedBlankLines && indentLevelOfNewLine <= baselineLevel) {
                     break
                 }
                 
                 // if the indent level (at some point) aka; went right-> (aka more indented)
-                indentLevelChanged = indentLevelChanged || (indentLevelOfNewLine != currentIndentLevel)
+                indentLevelChanged = indentLevelChanged || (indentLevelOfNewLine != baselineLevel)
                 if (indentLevelChanged) {
                     // and now its back to being the same
-                    if (indentLevelOfNewLine == currentIndentLevel) {
+                    if (indentLevelOfNewLine == baselineLevel) {
                         break
                     }
                 // if indent level never changed (were still inside the same block)
