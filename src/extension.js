@@ -257,12 +257,84 @@ function moveCursor({anchor, goUp, direction}) {
             break
     }
 
-
     const characterIndex = getCharacterIndexOfIndentFor(lineIndexToJumpTo)
     const active = currentFile.editor.selection.active.with(lineIndexToJumpTo, characterIndex)
     currentFile.editor.selection = new vscode.Selection(anchor || active, active)
-    currentFile.editor.revealRange(new vscode.Range(active, active))
+    currentFile.editor.revealRange(new vscode.Range(anchor || active, active))
 }
+
+function jumpTo(lineIndex, characterIndex) {
+    const editor = vscode.window.activeTextEditor
+    const active = editor.selection.active.with(lineIndex, characterIndex)
+    editor.selection = new vscode.Selection(active, active)
+    editor.revealRange(new vscode.Range(active, active))
+}
+
+function findAll(regexPattern, sourceString) {
+    let output = []
+    let match
+    // make sure the pattern has the global flag
+    let regexPatternWithGlobal = RegExp(regexPattern,'g'+regexPattern.flags)
+    while (match = regexPatternWithGlobal.exec(sourceString)) {
+        // get rid of the string copy
+        delete match.input
+        // store the match data
+        output.push(match)
+    } 
+    return output
+}
+
+const findNext = ({pattern, goBackwards=false, characterIndex=null, lineNumber=null}) => {
+    // process args
+    const editor = vscode.window.activeTextEditor
+    if (characterIndex==null) { characterIndex = editor.selection.start.character }
+    if (lineNumber==null    ) { lineNumber = editor.selection.start.line }
+    
+    // find the lineNumber and characterIndex
+    const directionNumber = goBackwards ? -1 : 1
+    const startingLine = lineNumber
+    const startingCharIndex = characterIndex
+    let startingPostion = [ startingLine, startingCharIndex ]
+    lineNumber -= directionNumber // offset for first iter of loop
+    while (true) {
+        try {
+            lineNumber += directionNumber
+            var lineContent = editor.document.lineAt(lineNumber).text
+        } catch (error) {
+            break
+        }
+        let matches = findAll(pattern, lineContent)
+        if (matches.length > 0) {
+            if (!goBackwards) {
+                for (let eachMatch of matches) {
+                    if (lineNumber == startingLine) {
+                        // must be after starting position
+                        if (eachMatch.index > startingCharIndex) {
+                            return [lineNumber, eachMatch.index]
+                        }
+                    } else {
+                        return [lineNumber, eachMatch.index]
+                    }
+                }
+            } else {
+                for (let eachMatch of matches.reverse()) {
+                    console.debug(`eachMatch is:`,eachMatch)
+                    if (lineNumber == startingLine) {
+                        // must be before starting position
+                        if (eachMatch.index < startingCharIndex) {
+                            return [lineNumber, eachMatch.index]
+                        }
+                    } else {
+                        return [lineNumber, eachMatch.index]
+                    }
+                }
+            }
+        }
+    }
+    return startingPostion
+}
+
+const defaultQuotes = /"|'|`/
 
 module.exports = {
     activate(context) {
@@ -295,22 +367,33 @@ module.exports = {
                 moveCursor({ direction: "rightUp"})
             })
         )
+
+        context.subscriptions.push(
+            vscode.commands.registerCommand("mario.nextQuote", () => {
+                jumpTo(...findNext({pattern: defaultQuotes, }))
+            })
+        )
+
+        context.subscriptions.push(
+            vscode.commands.registerCommand("mario.previousQuote", () => {
+                jumpTo(...findNext({pattern: defaultQuotes, goBackwards: true}))
+            })
+        )
         
-        // TODO: remove 
         context.subscriptions.push(
             vscode.commands.registerCommand("mario.selectUp", () => {
                 moveCursor({
-                    anchor: anchorPosition(editor.selection)
+                    anchor: anchorPosition(vscode.window.activeTextEditor.selection),
+                    direction: "up",
                 })
             })
         )
 
-        // TODO: remove 
         context.subscriptions.push(
             vscode.commands.registerCommand("mario.selectDown", () => {
                 moveCursor({
-                    
-                    anchor: anchorPosition(editor.selection)
+                    anchor: anchorPosition(vscode.window.activeTextEditor.selection),
+                    direction: "down",
                 })
             })
         )

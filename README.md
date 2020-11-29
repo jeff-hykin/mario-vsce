@@ -17,27 +17,27 @@ Ever use Inspect Element on your browser, and navigate the elements using your a
 
 ```json
     {
-        "key": "alt+shift+w",
+        "key": "alt+w",
         "command": "mario.moveUp",
         "when": "editorTextFocus"
     },
     {
-        "key": "alt+shift+a",
+        "key": "alt+a",
         "command": "mario.moveToOuter",
         "when": "editorTextFocus"
     },
     {
-        "key": "alt+shift+s",
+        "key": "alt+s",
         "command": "mario.moveDown",
         "when": "editorTextFocus"
     },
     {
-        "key": "alt+shift+d",
+        "key": "alt+d",
         "command": "mario.moveDownToInner",
         "when": "editorTextFocus"
     },
     {
-        "key": "alt+shift+e",
+        "key": "alt+e",
         "command": "mario.moveUpToInner",
         "when": "editorTextFocus"
     },

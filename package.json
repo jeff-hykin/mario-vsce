@@ -2,7 +2,7 @@
     "name": "mario",
     "displayName": "Mario: The Block Jumper Extension",
     "description": "Cursor movement for speedrunners and pros",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "icon": "icon.png",
     "publisher": "jeff-hykin",
     "repository": {
@@ -29,7 +29,11 @@
         "onCommand:mario.moveDown",
         "onCommand:mario.moveToOuter",
         "onCommand:mario.moveDownToInner",
-        "onCommand:mario.moveUpToInner"
+        "onCommand:mario.moveUpToInner",
+        "onCommand:mario.selectUp",
+        "onCommand:mario.selectDown",
+        "onCommand:mario.nextQuote",
+        "onCommand:mario.previousQuote"
     ],
     "main": "./src/extension.js",
     "contributes": {
@@ -43,6 +47,14 @@
                 "title": "Mario: Move Down"
             },
             {
+                "command": "mario.selectUp",
+                "title": "Mario: Select Up"
+            },
+            {
+                "command": "mario.selectDown",
+                "title": "Mario: Select Down"
+            },
+            {
                 "command": "mario.moveToOuter",
                 "title": "Mario: Move To Outer Block"
             },
@@ -53,6 +65,14 @@
             {
                 "command": "mario.moveUpToInner",
                 "title": "Mario: Move Up To Inner"
+            },
+            {
+                "command": "mario.nextQuote",
+                "title": "Mario: Move To Next Quote"
+            },
+            {
+                "command": "mario.previousQuote",
+                "title": "Mario: Move To Previous Quote"
             }
         ]
     },
