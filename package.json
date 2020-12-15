@@ -73,6 +73,30 @@
             {
                 "command": "mario.previousQuote",
                 "title": "Mario: Move To Previous Quote"
+            },
+            {
+                "command": "mario.selectNextQuote",
+                "title": "Mario: Move To Next Quote"
+            },
+            {
+                "command": "mario.selectPreviousQuote",
+                "title": "Mario: Move To Previous Quote"
+            },
+            {
+                "command": "mario.nextComma",
+                "title": "Mario: Move To Next Quote"
+            },
+            {
+                "command": "mario.previousComma",
+                "title": "Mario: Move To Previous Quote"
+            },
+            {
+                "command": "mario.selectNextComma",
+                "title": "Mario: Move To Next Quote"
+            },
+            {
+                "command": "mario.selectPreviousComma",
+                "title": "Mario: Move To Previous Quote"
             }
         ]
     },

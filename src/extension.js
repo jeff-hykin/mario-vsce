@@ -93,7 +93,119 @@ let getApproxIndentLevel = (lineIndex) => {
     return currentFile.lineIndentCache[lineIndex] = getIndentAmount(line.text)
 }
 
-function moveCursor({anchor, goUp, direction}) {
+function cursorRightUp({direction, startingLineIndex, upperBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged}) {
+    // if cursor isn't after the indent, move it there
+    if (currentPosition.character < getCharacterIndexOfIndentFor(lineIndexToJumpTo)) {
+        return lineIndexToJumpTo
+    }
+    while (lineIndexToJumpTo > 0) {
+        --lineIndexToJumpTo
+        let newLineIndex = getApproxIndentLevel(lineIndexToJumpTo)
+
+        // skip blank lines
+        if (document.lineAt(lineIndexToJumpTo).isEmptyOrWhitespace) {
+            skippedBlankLines = true
+            continue
+        }
+
+        if (newLineIndex > currentIndentLevel) {
+            return lineIndexToJumpTo
+        // if its actually going back up, then stop and just go up one
+        } else if (newLineIndex < currentIndentLevel) {
+            lineIndexToJumpTo = currentPosition.line-1
+            return lineIndexToJumpTo
+        }
+    }
+    return lineIndexToJumpTo
+}
+
+function cursorRightDown({direction, startingLineIndex, upperBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged}) {
+    // if cursor isn't after the indent, move it there
+    if (currentPosition.character < getCharacterIndexOfIndentFor(lineIndexToJumpTo)) {
+        return lineIndexToJumpTo
+    }
+    while (lineIndexToJumpTo < upperBound) {
+        ++lineIndexToJumpTo
+        let newLineIndex = getApproxIndentLevel(lineIndexToJumpTo)
+        // skip blank lines
+        if (document.lineAt(lineIndexToJumpTo).isEmptyOrWhitespace) {
+            skippedBlankLines = true
+            continue
+        }
+
+        if (newLineIndex > currentIndentLevel) {
+            return lineIndexToJumpTo
+        // if its actually going back up, then stop and just go down one
+        } else if (newLineIndex < currentIndentLevel) {
+            lineIndexToJumpTo = currentPosition.line+1
+            return lineIndexToJumpTo
+        }
+    }
+    return lineIndexToJumpTo
+}
+
+function cursorLeft({direction, startingLineIndex, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged}) {
+    if (startingLineIndex == 0) {
+        return startingLineIndex
+    }
+    while (lineIndexToJumpTo > 0) {
+        --lineIndexToJumpTo
+        let newLineIndex = getApproxIndentLevel(lineIndexToJumpTo)
+        if (newLineIndex < currentIndentLevel) {
+            return lineIndexToJumpTo
+        }
+        // break condition
+        if (!(lineIndexToJumpTo > 0)) {
+            // go up 1 on failure
+            if (currentFile.indexIsInBounds(startingLineIndex-1)) {
+                return cursorUpOrDown({direction:"up", lineIndexToJumpTo: startingLineIndex, startingLineIndex, getCharacterIndexOfIndentFor, document, currentPosition, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged})
+            }
+            return startingLineIndex
+        }
+    }
+}
+
+function cursorUpOrDown({direction, startingLineIndex, upperBound, lowerBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line}) {
+    const baselineLevel = getIndentAmount(line.text.slice(0, currentFile.editor.selection.start.character))
+    const goingUp = direction == "up"
+    const incrementor = goingUp ? -1 : 1
+    let iterNumber = 0
+    let stayWithinBlock = false
+    let failureValue = startingLineIndex
+    while (true) {
+        iterNumber++
+        // if failed, then just go up or down 1
+        if (!currentFile.indexIsInBounds(lineIndexToJumpTo+incrementor)) {
+            return failureValue
+        }
+        // go up or down the line index
+        lineIndexToJumpTo += incrementor
+        indentLevelOfNewLine = getApproxIndentLevel(lineIndexToJumpTo)
+        // info
+        let indentLevelChanged = indentLevelOfNewLine != baselineLevel
+        let blankLine = document.lineAt(lineIndexToJumpTo).isEmptyOrWhitespace
+        
+        // not going past the edge (and not starting in blank space)
+        if (iterNumber == 1 && !(blankLine || indentLevelChanged)) {
+            stayWithinBlock = true
+        }
+        
+        // not on the edge and not starting in blank space
+        if (stayWithinBlock) {
+            if (indentLevelChanged || blankLine) {
+                return lineIndexToJumpTo-incrementor
+            }
+        } else {
+            // we found a block, now stay in it
+            if (indentLevelOfNewLine == baselineLevel && !blankLine) {
+                stayWithinBlock = true
+                failureValue = lineIndexToJumpTo
+            }
+        }
+    }
+}
+
+function moveCursor({anchor, direction}) {
     // update the editor
     currentFile.editor = vscode.window.activeTextEditor
     currentFile.tabSize = currentFile.editor.options.tabSize
@@ -106,153 +218,35 @@ function moveCursor({anchor, goUp, direction}) {
     
     let document = currentFile.editor.document
     let currentPosition = currentFile.editor.selection.active
-    let lineIndexToJumpTo = currentPosition.line
+    const startingLineIndex = currentPosition.line
+    let lineIndexToJumpTo = startingLineIndex
     var currentIndentLevel = getApproxIndentLevel(currentPosition.line)
     let indentLevelOfNewLine = currentIndentLevel
     let hitAtLeastOneLineWithDifferentIndent = false
     let line = document.lineAt(currentPosition.line)
-    let startedOnBlankLine = line.isEmptyOrWhitespace
     var skippedBlankLines = false
     var indentLevelChanged = false
     switch (direction) {
-                    
         // next line (up) with the same or smaller indent    
         case "up":
         // next line (down) with the same or smaller indent
         case "down":
-            // 
-            // this loop is a little complicated because of this case:
-            // 1. blah blah blah
-            // 2.     blah blah
-            // 3.        blah blah
-            // 4.        blah blah
-            // 5.        blah blah   
-            // 6.        blah blah   <- cursor starts here
-            // 7.        blah blah
-            // 8.  blah
-            // 
-            // *moveUp*
-            // 
-            // 1. blah blah blah
-            // 2.     blah blah
-            // 3.        blah blah   <- cursor should end up here 
-            // 4.        blah blah
-            // 5.        blah blah   
-            // 6.        blah blah   
-            // 7.        blah blah
-            // 8.  blah
-            let incrementor = direction == "up" ? -1 : 1
-            let baselineLevel = getIndentAmount(line.text.slice(0, currentFile.editor.selection.start.character))
-            while (currentFile.indexIsInBounds(lineIndexToJumpTo+incrementor)) {
-                // go up or down the line index
-                lineIndexToJumpTo += incrementor
-
-                indentLevelOfNewLine = getApproxIndentLevel(lineIndexToJumpTo)
-                
-                // stop if the next line is un-indented
-                if (indentLevelOfNewLine < baselineLevel) {
-                    break
-                }
-                
-                // skip blank lines
-                if (document.lineAt(lineIndexToJumpTo).isEmptyOrWhitespace) {
-                    skippedBlankLines = true
-                    continue
-                }
-                // stop after skipping blank lines
-                if (skippedBlankLines && indentLevelOfNewLine <= baselineLevel) {
-                    break
-                }
-                
-                // if the indent level (at some point) aka; went right-> (aka more indented)
-                indentLevelChanged = indentLevelChanged || (indentLevelOfNewLine != baselineLevel)
-                if (indentLevelChanged) {
-                    // and now its back to being the same
-                    if (indentLevelOfNewLine == baselineLevel) {
-                        break
-                    }
-                // if indent level never changed (were still inside the same block)
-                } else {
-                    // look ahead for a signal that the block just ended
-                    let nextIndex = lineIndexToJumpTo+incrementor
-                    if (currentFile.indexIsInBounds(nextIndex)) {
-                        let blockStoppedByParentOrChild = getApproxIndentLevel(nextIndex) != indentLevelOfNewLine
-                        if (blockStoppedByParentOrChild) {
-                            break
-                        }
-                        let blockStoppedByBlankLines = document.lineAt(nextIndex).isEmptyOrWhitespace
-                        if (blockStoppedByBlankLines) {
-                            break
-                        }
-                    }
-                }
-            }
+            lineIndexToJumpTo = cursorUpOrDown({direction, startingLineIndex, upperBound, lowerBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged})
             break
 
         // next line (up) with a smaller indent
         case "left":
-            // if cursor isn't at the front of the line, move it there
-            if (currentPosition.character > getCharacterIndexOfIndentFor(lineIndexToJumpTo)) {
-                break
-            }
-            while (lineIndexToJumpTo > 0) {
-                --lineIndexToJumpTo
-                let newLineIndex = getApproxIndentLevel(lineIndexToJumpTo)
-                if (newLineIndex < currentIndentLevel) {
-                    break
-                }
-            }
+            lineIndexToJumpTo = cursorLeft({direction, startingLineIndex, upperBound, lowerBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged})
             break
 
         // next line (down) with a larger indent
         case "rightDown":
-            // if cursor isn't after the indent, move it there
-            if (currentPosition.character < getCharacterIndexOfIndentFor(lineIndexToJumpTo)) {
-                break
-            }
-            while (lineIndexToJumpTo < upperBound) {
-                ++lineIndexToJumpTo
-                let newLineIndex = getApproxIndentLevel(lineIndexToJumpTo)
-                // skip blank lines
-                if (document.lineAt(lineIndexToJumpTo).isEmptyOrWhitespace) {
-                    skippedBlankLines = true
-                    continue
-                }
-
-                if (newLineIndex > currentIndentLevel) {
-                    break
-                // if its actually going back up, then stop and just go down one
-                } else if (newLineIndex < currentIndentLevel) {
-                    lineIndexToJumpTo = currentPosition.line+1
-                    break
-                }
-            }
+            lineIndexToJumpTo = cursorRightDown({direction, startingLineIndex, upperBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged})
             break
 
         // next line (up) with a larger indent
         case "rightUp":
-            // if cursor isn't after the indent, move it there
-            if (currentPosition.character < getCharacterIndexOfIndentFor(lineIndexToJumpTo)) {
-                break
-            }
-            while (lineIndexToJumpTo > 0) {
-                --lineIndexToJumpTo
-                let newLineIndex = getApproxIndentLevel(lineIndexToJumpTo)
-
-                // skip blank lines
-                if (document.lineAt(lineIndexToJumpTo).isEmptyOrWhitespace) {
-                    skippedBlankLines = true
-                    continue
-                }
-
-                if (newLineIndex > currentIndentLevel) {
-                    break
-                // if its actually going back up, then stop and just go up one
-                } else if (newLineIndex < currentIndentLevel) {
-                    lineIndexToJumpTo = currentPosition.line-1
-                    break
-                }
-            }
+            lineIndexToJumpTo = cursorRightUp({direction, startingLineIndex, upperBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged})
             break
     }
 
@@ -262,11 +256,11 @@ function moveCursor({anchor, goUp, direction}) {
     currentFile.editor.revealRange(new vscode.Range(anchor || active, active))
 }
 
-function jumpTo(lineIndex, characterIndex) {
+function jumpTo({lineIndex, characterIndex, anchor}) {
     const editor = vscode.window.activeTextEditor
     const active = editor.selection.active.with(lineIndex, characterIndex)
-    editor.selection = new vscode.Selection(active, active)
-    editor.revealRange(new vscode.Range(active, active))
+    editor.selection = new vscode.Selection(anchor || active, active)
+    editor.revealRange(new vscode.Range(anchor || active, active))
 }
 
 function findAll(regexPattern, sourceString) {
@@ -317,7 +311,6 @@ const findNext = ({pattern, goBackwards=false, characterIndex=null, lineNumber=n
                 }
             } else {
                 for (let eachMatch of matches.reverse()) {
-                    console.debug(`eachMatch is:`,eachMatch)
                     if (lineNumber == startingLine) {
                         // must be before starting position
                         if (eachMatch.index < startingCharIndex) {
@@ -333,49 +326,35 @@ const findNext = ({pattern, goBackwards=false, characterIndex=null, lineNumber=n
     return startingPostion
 }
 
-const defaultQuotes = /"|'|`/
-
 module.exports = {
     activate(context) {
         context.subscriptions.push(
             vscode.commands.registerCommand("mario.moveUp", () => {
-                moveCursor({ direction: "up"})
+                moveCursor({ direction: "up" })
             })
         )
 
         context.subscriptions.push(
             vscode.commands.registerCommand("mario.moveDown", () => {
-                moveCursor({ direction: "down"})
+                moveCursor({ direction: "down" })
             })
         )
         
         context.subscriptions.push(
             vscode.commands.registerCommand("mario.moveToOuter", () => {
-                moveCursor({ direction: "left"})
+                moveCursor({ direction: "left" })
             })
         )
 
         context.subscriptions.push(
             vscode.commands.registerCommand("mario.moveDownToInner", () => {
-                moveCursor({ direction: "rightDown"})
+                moveCursor({ direction: "rightDown" })
             })
         )
 
         context.subscriptions.push(
             vscode.commands.registerCommand("mario.moveUpToInner", () => {
-                moveCursor({ direction: "rightUp"})
-            })
-        )
-
-        context.subscriptions.push(
-            vscode.commands.registerCommand("mario.nextQuote", () => {
-                jumpTo(...findNext({pattern: defaultQuotes, }))
-            })
-        )
-
-        context.subscriptions.push(
-            vscode.commands.registerCommand("mario.previousQuote", () => {
-                jumpTo(...findNext({pattern: defaultQuotes, goBackwards: true}))
+                moveCursor({ direction: "rightUp" })
             })
         )
         
@@ -396,6 +375,47 @@ module.exports = {
                 })
             })
         )
+
+        function nextFinder(name, pattern) {
+            context.subscriptions.push(
+                vscode.commands.registerCommand(`mario.next${name}`, () => {
+                    let [lineIndex, characterIndex] = findNext({pattern: pattern, })
+                    jumpTo({ lineIndex, characterIndex, })
+                })
+            )
+
+            context.subscriptions.push(
+                vscode.commands.registerCommand(`mario.previous${name}`, () => {
+                    let [lineIndex, characterIndex] = findNext({pattern: pattern, goBackwards: true})
+                    jumpTo({ lineIndex, characterIndex, })
+                })
+            )
+            
+            context.subscriptions.push(
+                vscode.commands.registerCommand(`mario.selectNext${name}`, () => {
+                    let [lineIndex, characterIndex] = findNext({pattern: pattern, })
+                    jumpTo({
+                        lineIndex,
+                        characterIndex, 
+                        anchor: anchorPosition(vscode.window.activeTextEditor.selection),
+                    })
+                })
+            )
+
+            context.subscriptions.push(
+                vscode.commands.registerCommand(`mario.selectPrevious${name}`, () => {
+                    let [lineIndex, characterIndex] = findNext({pattern: pattern, goBackwards: true})
+                    jumpTo({
+                        lineIndex,
+                        characterIndex, 
+                        anchor: anchorPosition(vscode.window.activeTextEditor.selection),
+                    })
+                })
+            )
+        }
+
+        nextFinder("Quote", /"|'|`/)
+        nextFinder("Comma", /,/)
     },
 
     deactivate() {
