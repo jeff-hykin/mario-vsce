@@ -345,6 +345,15 @@ module.exports = {
                 moveCursor({ direction: "left" })
             })
         )
+        
+        context.subscriptions.push(
+            vscode.commands.registerCommand("mario.selectToOuter", () => {
+                moveCursor({
+                    direction: "left",
+                    anchor: anchorPosition(vscode.window.activeTextEditor.selection),
+                })
+            })
+        )
 
         context.subscriptions.push(
             vscode.commands.registerCommand("mario.moveDownToInner", () => {
