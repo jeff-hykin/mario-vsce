@@ -1,9 +1,10 @@
 # Block Jumper (Mario)
 
-Tired of using your mouse like an amateur? Add this extension to your arsenal.
-
-This extension works like W,A,S,D based on blocks of code (indented or seperated by whitespace).
+This extension works like W,A,S,D based on blocks of code (code that's indented or seperated by whitespace).
 Ever use Inspect Element on your browser, and navigate the elements using your arrow keys? This behaves similarly but for all code.
+
+![block jumper](https://user-images.githubusercontent.com/17692058/108124841-449fc680-706d-11eb-9507-c9bc9bb4b211.gif)
+
 
 ## How Do I Use It?
 1. Install the extension on VS Code
