@@ -3,10 +3,12 @@ let vscode = require("vscode")
 
 // global var that is updated when called on a new active document
 let currentFile = {
-    editor: null,
     tabSize: null,
     lineIndentCache: {},
     indexIsInBounds: ()=>0,
+    get editor() {
+        return vscode.window.activeTextEditor
+    },
 }
 
 function anchorPosition(selection) {
@@ -145,6 +147,10 @@ function cursorRightDown({direction, startingLineIndex, upperBound, getCharacter
 }
 
 function cursorLeft({direction, startingLineIndex, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged}) {
+    // if already top level
+    if (currentIndentLevel == 0) {
+        return moveCursor({ direction: "up" })
+    }
     if (startingLineIndex == 0) {
         return startingLineIndex
     }
@@ -176,7 +182,11 @@ function cursorUpOrDown({direction, startingLineIndex, upperBound, lowerBound, g
         iterNumber++
         // if failed, then just go up or down 1
         if (!currentFile.indexIsInBounds(lineIndexToJumpTo+incrementor)) {
-            return failureValue
+            if (goingUp) {
+                return lowerBound
+            } else {
+                return upperBound
+            }
         }
         // go up or down the line index
         lineIndexToJumpTo += incrementor
@@ -207,7 +217,6 @@ function cursorUpOrDown({direction, startingLineIndex, upperBound, lowerBound, g
 
 function moveCursor({anchor, direction}) {
     // update the editor
-    currentFile.editor = vscode.window.activeTextEditor
     currentFile.tabSize = currentFile.editor.options.tabSize
     currentFile.lineIndentCache = {}
     // NOTE: bit of a misnomer cause the upperBound is the BOTTOM of the file (but its a larger line number)
