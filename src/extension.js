@@ -146,10 +146,10 @@ function cursorRightDown({direction, startingLineIndex, upperBound, getCharacter
     return lineIndexToJumpTo
 }
 
-function cursorLeft({direction, startingLineIndex, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged}) {
+function cursorLeft({direction, startingLineIndex, upperBound, lowerBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged}) {
     // if already top level
     if (currentIndentLevel == 0) {
-        return moveCursor({ direction: "up" })
+        return cursorUpOrDown({direction: "up", startingLineIndex, upperBound, lowerBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged})
     }
     if (startingLineIndex == 0) {
         return startingLineIndex
@@ -216,53 +216,63 @@ function cursorUpOrDown({direction, startingLineIndex, upperBound, lowerBound, g
 }
 
 function moveCursor({anchor, direction}) {
-    // update the editor
-    currentFile.tabSize = currentFile.editor.options.tabSize
-    currentFile.lineIndentCache = {}
-    // NOTE: bit of a misnomer cause the upperBound is the BOTTOM of the file (but its a larger line number)
-    const upperBound = currentFile.editor.document.lineCount - 1
-    const lowerBound = 0
-    currentFile.indexIsInBounds = (index) => index <= upperBound && index >= lowerBound
-    let getCharacterIndexOfIndentFor = (lineIndex) => (document.lineAt(lineIndex).text.match(/^[\t ]*/)[0].length)
-    
-    let document = currentFile.editor.document
-    let currentPosition = currentFile.editor.selection.active
-    const startingLineIndex = currentPosition.line
-    let lineIndexToJumpTo = startingLineIndex
-    var currentIndentLevel = getApproxIndentLevel(currentPosition.line)
-    let indentLevelOfNewLine = currentIndentLevel
-    let hitAtLeastOneLineWithDifferentIndent = false
-    let line = document.lineAt(currentPosition.line)
-    var skippedBlankLines = false
-    var indentLevelChanged = false
-    switch (direction) {
-        // next line (up) with the same or smaller indent    
-        case "up":
-        // next line (down) with the same or smaller indent
-        case "down":
-            lineIndexToJumpTo = cursorUpOrDown({direction, startingLineIndex, upperBound, lowerBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged})
-            break
+    try {
+        // update the editor
+        currentFile.tabSize = currentFile.editor.options.tabSize
+        currentFile.lineIndentCache = {}
+        // NOTE: bit of a misnomer cause the upperBound is the BOTTOM of the file (but its a larger line number)
+        const upperBound = currentFile.editor.document.lineCount - 1
+        const lowerBound = 0
+        currentFile.indexIsInBounds = (index) => index <= upperBound && index >= lowerBound
+        let getCharacterIndexOfIndentFor = (lineIndex) => (document.lineAt(lineIndex).text.match(/^[\t ]*/)[0].length)
+        
+        let document = currentFile.editor.document
+        let currentPosition = currentFile.editor.selection.active
+        const startingLineIndex = currentPosition.line
+        let lineIndexToJumpTo = startingLineIndex
+        var currentIndentLevel = getApproxIndentLevel(currentPosition.line)
+        const startingIndentLevel = currentIndentLevel
+        let indentLevelOfNewLine = currentIndentLevel
+        let hitAtLeastOneLineWithDifferentIndent = false
+        let line = document.lineAt(currentPosition.line)
+        var skippedBlankLines = false
+        var indentLevelChanged = false
+        switch (direction) {
+            // next line (up) with the same or smaller indent    
+            case "up":
+            // next line (down) with the same or smaller indent
+            case "down":
+                lineIndexToJumpTo = cursorUpOrDown({direction, startingLineIndex, upperBound, lowerBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged})
+                break
 
-        // next line (up) with a smaller indent
-        case "left":
-            lineIndexToJumpTo = cursorLeft({direction, startingLineIndex, upperBound, lowerBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged})
-            break
+            // next line (up) with a smaller indent
+            case "left":
+                lineIndexToJumpTo = cursorLeft({direction, startingLineIndex, upperBound, lowerBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged})
+                break
 
-        // next line (down) with a larger indent
-        case "rightDown":
-            lineIndexToJumpTo = cursorRightDown({direction, startingLineIndex, upperBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged})
-            break
+            // next line (down) with a larger indent
+            case "rightDown":
+                lineIndexToJumpTo = cursorRightDown({direction, startingLineIndex, upperBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged})
+                break
 
-        // next line (up) with a larger indent
-        case "rightUp":
-            lineIndexToJumpTo = cursorRightUp({direction, startingLineIndex, upperBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged})
-            break
+            // next line (up) with a larger indent
+            case "rightUp":
+                lineIndexToJumpTo = cursorRightUp({direction, startingLineIndex, upperBound, getCharacterIndexOfIndentFor, document, currentPosition, lineIndexToJumpTo, currentIndentLevel, indentLevelOfNewLine, hitAtLeastOneLineWithDifferentIndent, line, skippedBlankLines, indentLevelChanged})
+                break
+        }
+            
+        let characterIndex = getCharacterIndexOfIndentFor(lineIndexToJumpTo)
+        if (direction == "up" || direction == "down") {
+            const startingCharIndex = startingIndentLevel * currentFile.tabSize
+            characterIndex = startingCharIndex < characterIndex ? startingCharIndex : characterIndex
+        }
+
+        const active = currentFile.editor.selection.active.with(lineIndexToJumpTo, characterIndex)
+        currentFile.editor.selection = new vscode.Selection(anchor || active, active)
+        currentFile.editor.revealRange(new vscode.Range(anchor || active, active))
+    } catch (error) {
+        console.debug(`error is:`,error)
     }
-
-    const characterIndex = getCharacterIndexOfIndentFor(lineIndexToJumpTo)
-    const active = currentFile.editor.selection.active.with(lineIndexToJumpTo, characterIndex)
-    currentFile.editor.selection = new vscode.Selection(anchor || active, active)
-    currentFile.editor.revealRange(new vscode.Range(anchor || active, active))
 }
 
 function jumpTo({lineIndex, characterIndex, anchor}) {

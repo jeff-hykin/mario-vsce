@@ -88,6 +88,5 @@ To use the following shortcuts, do (cmd/ctrl)+P then type "Preferences: Open Key
 
 ## ToDo / Bugs
 
-- Bug: Going down on the last block doesn't go to the very bottom of the file
 - Select-out and select-in haven't been implemented yet
 - Fix/improve the built-in jump-to-bracket and select-to-bracket
