@@ -356,6 +356,7 @@ const findNext = ({pattern, goBackwards=false, startingCharacterIndex=null, star
                     if (lineIndex == searchStartLineIndex) {
                         // must be after starting position
                         if (eachMatch.index > searchStartCharacterIndex) {
+                            console.debug(`searchStartCharacterIndex is:`,searchStartCharacterIndex)
                             characterIndex = eachMatch.index
                             break mainLoop
                         }
@@ -516,7 +517,7 @@ module.exports = {
             )
         }
 
-        nextFinder("Quote", /"|'|`/)
+        nextFinder("Quote", /"|'|`/) // TODO: make quote know which quote it is matching (when finding more quotes in a selection)
         nextFinder("Comma", /,/)
     },
 
