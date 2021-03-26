@@ -446,16 +446,16 @@ module.exports = {
             context.subscriptions.push(vscode.commands.registerCommand("mario."+name, command))
         }
         
-        newCommand({       name:"moveUp"           , command: ()=>cursorJumpBlock({ direction: "up",                                  })       })
-        newCommand({       name:"selectUp"         , command: ()=>cursorJumpBlock({ direction: "up",        anchor: anchorPosition(), })       })
-        newCommand({       name:"moveDown"         , command: ()=>cursorJumpBlock({ direction: "down",                                })       })
-        newCommand({       name:"selectDown"       , command: ()=>cursorJumpBlock({ direction: "down",      anchor: anchorPosition(), })       })
-        newCommand({       name:"moveToOuter"      , command: ()=>cursorJumpBlock({ direction: "left",                                })       })
-        newCommand({       name:"selectToOuter"    , command: ()=>cursorJumpBlock({ direction: "left",      anchor: anchorPosition(), })       })
-        newCommand({       name:"moveUpToInner"    , command: ()=>cursorJumpBlock({ direction: "rightUp",                             })       })
-        newCommand({       name:"selectUpToInner"  , command: ()=>cursorJumpBlock({ direction: "rightUp",   anchor: anchorPosition(), })       })
-        newCommand({       name:"moveDownToInner"  , command: ()=>cursorJumpBlock({ direction: "rightDown",                           })       })
-        newCommand({       name:"selectDownToInner", command: ()=>cursorJumpBlock({ direction: "rightDown", anchor: anchorPosition(), })       })
+        newCommand({       name:"moveUp"           , command: ()=>cursorJumpBlock({ direction: "up",                                })       })
+        newCommand({       name:"selectUp"         , command: ()=>cursorJumpBlock({ direction: "up",        shouldSelectRange:true, })       })
+        newCommand({       name:"moveDown"         , command: ()=>cursorJumpBlock({ direction: "down",                              })       })
+        newCommand({       name:"selectDown"       , command: ()=>cursorJumpBlock({ direction: "down",      shouldSelectRange:true, })       })
+        newCommand({       name:"moveToOuter"      , command: ()=>cursorJumpBlock({ direction: "left",                              })       })
+        newCommand({       name:"selectToOuter"    , command: ()=>cursorJumpBlock({ direction: "left",      shouldSelectRange:true, })       })
+        newCommand({       name:"moveUpToInner"    , command: ()=>cursorJumpBlock({ direction: "rightUp",                           })       })
+        newCommand({       name:"selectUpToInner"  , command: ()=>cursorJumpBlock({ direction: "rightUp",   shouldSelectRange:true, })       })
+        newCommand({       name:"moveDownToInner"  , command: ()=>cursorJumpBlock({ direction: "rightDown",                         })       })
+        newCommand({       name:"selectDownToInner", command: ()=>cursorJumpBlock({ direction: "rightDown", shouldSelectRange:true, })       })
         
         function nextFinder(name, pattern) {
             const genericFindNextFunction = ({ goBackwards, shouldSelectRange }) => {
