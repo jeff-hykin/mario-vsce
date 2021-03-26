@@ -267,19 +267,43 @@ function moveCursor({anchor, direction}) {
             characterIndex = startingCharIndex < characterIndex ? startingCharIndex : characterIndex
         }
 
-        const active = currentFile.editor.selection.active.with(lineIndexToJumpTo, characterIndex)
-        currentFile.editor.selection = new vscode.Selection(anchor || active, active)
-        currentFile.editor.revealRange(new vscode.Range(anchor || active, active))
+        const newLocation = currentFile.editor.selection.active.with(lineIndexToJumpTo, characterIndex)
+        currentFile.editor.selection = new vscode.Selection(anchor || newLocation, newLocation)
+        // always reveal where the cursor moved to, instead of the top of the selection
+        currentFile.editor.revealRange(new vscode.Range(newLocation, newLocation))
     } catch (error) {
-        console.debug(`error is:`,error)
+        console.debug(`mario error is:`,error)
     }
 }
 
-function jumpTo({lineIndex, characterIndex, anchor}) {
+function jumpTo({ newLocations }) {
     const editor = vscode.window.activeTextEditor
-    const active = editor.selection.active.with(lineIndex, characterIndex)
-    editor.selection = new vscode.Selection(anchor || active, active)
-    editor.revealRange(new vscode.Range(anchor || active, active))
+    if (newLocations.length == 1) {
+        const {lineIndex, characterIndex, startingCharacterIndex, startingLineIndex, } = newLocations[0]
+        const newCursorStartLocation = editor.selection.active.with(startingLineIndex, startingCharacterIndex)
+        const newCursorEndLocation = editor.selection.active.with(lineIndex, characterIndex)
+        editor.selection = new vscode.Selection(newCursorStartLocation, newCursorEndLocation)
+        // only reveal the ending
+        editor.revealRange(new vscode.Range(newCursorEndLocation, newCursorEndLocation))
+    } else if (newLocations.length > 0) {
+        newLocations = [...newLocations] // copy to prevent mutation
+        let selectionObjects = []
+        for (const eachSelection of editor.selections) {
+            const nextLocation = newLocations.shift()
+            if (nextLocation === undefined) {
+                break
+            }
+            const { lineIndex, characterIndex, startingLineIndex, startingCharacterIndex, } = nextLocation
+            const newCursorStartLocation = eachSelection.active.with(startingLineIndex, startingCharacterIndex)
+            const newCursorEndLocation = eachSelection.active.with(lineIndex, characterIndex)
+            selectionObjects.push(new vscode.Selection(newCursorStartLocation, newCursorEndLocation))
+        }
+        // change all the cursors at one time
+        editor.selections = selectionObjects
+        // TODO: find a similar command to the one commented out below, but limit it to horizontal movement only
+        // otherwise it will have annoying behavior like snapping to the first/last selection when viewing the middle of multple selections
+        // editor.revealRange(new vscode.Range(newCursorLocation, newCursorLocation))
+    }
 }
 
 function findAll(regexPattern, sourceString) {
@@ -296,53 +320,91 @@ function findAll(regexPattern, sourceString) {
     return output
 }
 
-const findNext = ({pattern, goBackwards=false, characterIndex=null, lineNumber=null}) => {
+const findNext = ({pattern, goBackwards=false, startingCharacterIndex=null, startingLineIndex=null, selection=null, shouldSelectRange=false}) => {
     // process args
-    const editor = vscode.window.activeTextEditor
-    if (characterIndex==null) { characterIndex = editor.selection.start.character }
-    if (lineNumber==null    ) { lineNumber = editor.selection.start.line }
+    if (selection             ==null) { selection              = vscode.window.activeTextEditor.selection }
+    const defaultSearchStartCharacterIndex = goBackwards ? selection.start.character : selection.end.character 
+    const defaultSearchStartLineIndex      = goBackwards ? selection.start.line      : selection.end.line      
+    const searchStartCharacterIndex = startingCharacterIndex == null ? defaultSearchStartCharacterIndex : startingCharacterIndex
+    const searchStartLineIndex      = startingLineIndex      == null ? defaultSearchStartLineIndex      : startingLineIndex
+
+    // TODO: make this where it remembers what just happened
+    const previousCallValue = JSON.parse(JSON.stringify(findNext.dataForNextCall||null))
+    findNext.dataForNextCall = { args:  {pattern, goBackwards, startingCharacterIndex, startingLineIndex, selection, shouldSelectRange}}
     
-    // find the lineNumber and characterIndex
+    // setup
+    const editor = vscode.window.activeTextEditor
+    let characterIndex = searchStartCharacterIndex
+    let lineIndex      = searchStartLineIndex
     const directionNumber = goBackwards ? -1 : 1
-    const startingLine = lineNumber
-    const startingCharIndex = characterIndex
-    let startingPostion = [ startingLine, startingCharIndex ]
-    lineNumber -= directionNumber // offset for first iter of loop
-    while (true) {
+    
+    // now try to find the next lineIndex and characterIndex
+    lineIndex -= directionNumber // offset the begining becase the ++ is done at the top of the loop
+    mainLoop: while (true) {
         try {
-            lineNumber += directionNumber
-            var lineContent = editor.document.lineAt(lineNumber).text
+            lineIndex += directionNumber
+            var lineContent = editor.document.lineAt(lineIndex).text
         } catch (error) {
-            break
+            lineIndex = searchStartLineIndex
+            characterIndex = searchStartCharacterIndex
+            break mainLoop
         }
         let matches = findAll(pattern, lineContent)
         if (matches.length > 0) {
             if (!goBackwards) {
                 for (let eachMatch of matches) {
-                    if (lineNumber == startingLine) {
+                    if (lineIndex == searchStartLineIndex) {
                         // must be after starting position
-                        if (eachMatch.index > startingCharIndex) {
-                            return [lineNumber, eachMatch.index]
+                        if (eachMatch.index > searchStartCharacterIndex) {
+                            characterIndex = eachMatch.index
+                            break mainLoop
                         }
                     } else {
-                        return [lineNumber, eachMatch.index]
+                        characterIndex = eachMatch.index
+                        break mainLoop
                     }
                 }
             } else {
                 for (let eachMatch of matches.reverse()) {
-                    if (lineNumber == startingLine) {
+                    if (lineIndex == searchStartLineIndex) {
                         // must be before starting position
-                        if (eachMatch.index < startingCharIndex) {
-                            return [lineNumber, eachMatch.index]
+                        if (eachMatch.index < searchStartCharacterIndex-1) {
+                            characterIndex = eachMatch.index+1
+                            break mainLoop
                         }
                     } else {
-                        return [lineNumber, eachMatch.index]
+                        characterIndex = eachMatch.index+1
+                        break mainLoop
                     }
                 }
             }
         }
     }
-    return startingPostion
+    // 
+    // selection range calculation
+    // 
+    if (!shouldSelectRange) {
+        startingCharacterIndex = characterIndex
+        startingLineIndex = lineIndex
+    } else {
+        // if changed directions
+        if (previousCallValue && previousCallValue.args.goBackwards != goBackwards) {
+            // figure out the original starting point
+            startingCharacterIndex = goBackwards ? selection.start.character : selection.end.character      
+            startingLineIndex      = goBackwards ? selection.start.line      : selection.end.line      
+        } else {
+            startingCharacterIndex = goBackwards ? selection.end.character : selection.start.character
+            startingLineIndex      = goBackwards ? selection.end.line      : selection.start.line
+        }
+    }
+    // TODO: increment one in the fail case of start-of-document or end-of-document
+    findNext.dataForNextCall.returnValue = {
+        lineIndex,
+        characterIndex,
+        startingCharacterIndex,
+        startingLineIndex
+    }
+    return findNext.dataForNextCall.returnValue
 }
 
 module.exports = {
@@ -407,37 +469,49 @@ module.exports = {
         function nextFinder(name, pattern) {
             context.subscriptions.push(
                 vscode.commands.registerCommand(`mario.next${name}`, () => {
-                    let [lineIndex, characterIndex] = findNext({pattern: pattern, })
-                    jumpTo({ lineIndex, characterIndex, })
+                    try {
+                        const editor = vscode.window.activeTextEditor
+                        let newLocations = editor.selections.map(eachSelection => findNext({pattern: pattern, selection: eachSelection}))
+                        jumpTo({ newLocations, })
+                    } catch (error) {
+                        console.debug(`mario.next${name} error is:`,error)
+                    }
                 })
             )
 
             context.subscriptions.push(
                 vscode.commands.registerCommand(`mario.previous${name}`, () => {
-                    let [lineIndex, characterIndex] = findNext({pattern: pattern, goBackwards: true})
-                    jumpTo({ lineIndex, characterIndex, })
+                    try {
+                        const editor = vscode.window.activeTextEditor
+                        let newLocations = editor.selections.map(eachSelection => findNext({pattern: pattern, selection: eachSelection, goBackwards: true, }))
+                        jumpTo({ newLocations, })
+                    } catch (error) {
+                        console.debug(`mario.previous${name} error is:`,error)
+                    }
                 })
             )
             
             context.subscriptions.push(
                 vscode.commands.registerCommand(`mario.selectNext${name}`, () => {
-                    let [lineIndex, characterIndex] = findNext({pattern: pattern, })
-                    jumpTo({
-                        lineIndex,
-                        characterIndex, 
-                        anchor: anchorPosition(vscode.window.activeTextEditor.selection),
-                    })
+                    try {
+                        const editor = vscode.window.activeTextEditor
+                        let newLocations = editor.selections.map(eachSelection => findNext({pattern: pattern, selection: eachSelection, shouldSelectRange: true, }))
+                        jumpTo({ newLocations, })
+                    } catch (error) {
+                        console.debug(`mario.selectNext${name} error is:`,error)
+                    }
                 })
             )
 
             context.subscriptions.push(
                 vscode.commands.registerCommand(`mario.selectPrevious${name}`, () => {
-                    let [lineIndex, characterIndex] = findNext({pattern: pattern, goBackwards: true})
-                    jumpTo({
-                        lineIndex,
-                        characterIndex, 
-                        anchor: anchorPosition(vscode.window.activeTextEditor.selection),
-                    })
+                    try {
+                        const editor = vscode.window.activeTextEditor
+                        let newLocations = editor.selections.map(eachSelection => findNext({pattern: pattern, selection: eachSelection, goBackwards: true, shouldSelectRange: true, }))
+                        jumpTo({ newLocations, })
+                    } catch (error) {
+                        console.debug(`mario.selectPrevious${name} error is:`,error)
+                    }
                 })
             )
         }
