@@ -71,11 +71,11 @@ To use the following shortcuts, do (cmd/ctrl)+P then type "Preferences: Open Key
     // 
     // jump/select to quote
     // 
-    { "key": "alt+'",       "command": "mario.nextQuote",           "when": "editorTextFocus" },
-    { "key": "alt+;",       "command": "mario.previousQuote",       "when": "editorTextFocus" },
-    { "key": "alt+shift+.", "command": "mario.selectNextQuote",     "when": "editorTextFocus" },
-    { "key": "alt+shift+,", "command": "mario.selectPreviousQuote", "when": "editorTextFocus" },
-    
+    { "key": "alt+]",       "command": "mario.nextBracket",           "when": "editorTextFocus" },
+    { "key": "alt+[",       "command": "mario.previousBracket",       "when": "editorTextFocus" },
+    { "key": "alt+shift+]", "command": "mario.selectNextBracket",     "when": "editorTextFocus" },
+    { "key": "alt+shift+[", "command": "mario.selectPreviousBracket", "when": "editorTextFocus" },
+
     // 
     // jump/select to bracket
     // (built-in commands, but these shortcuts play nice with other shortcuts)
