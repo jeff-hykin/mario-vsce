@@ -11,7 +11,7 @@ Ever use Inspect Element on your browser, and navigate the elements using your a
 2. Add Keyboard shortcuts (copy and paste below, or make your own)
 
 To use the following shortcuts, do (cmd/ctrl)+P then type "Preferences: Open Keyboard Shortcuts (JSON)" then pick and choose what kind of keybindings you want below.
-```json
+```jsonc
     // 
     // undo / redo jump
     // (built-in commands, but these shortcuts play nice with other shortcuts)
