@@ -12,21 +12,26 @@ Ever use Inspect Element on your browser, and navigate the elements using your a
 
 ### Here's the default shortcuts
 
-#### Blocks:
-- `ctrl+wasd` on Mac, `cmd+wasd` on Linux
-- `ctrl+ArrowKeys` on Mac, `cmd+ArrowKeys` on Linux
+(You can use shift with any of the jumps as well)
+
+#### Block Jump:
+- (you'll probably end up only using one of these)
+- `alt+WASD` (Mac/Linux/Windows)
+- `ctrl+WASD` (Mac)
+- `ctrl+ArrowKeys` (Mac)
+- `alt+ArrowKeys` (Linux/Windows)
+
+#### Quote Jump:
+- `alt+SingleQuote` go to the right -> (until a quote is hit)
+- `alt+Semicolon` go to the left <- (until a quote is hit)
+
+#### Comma Jump:
+- `alt+Comma` go to the left <- (until a comma is hit)
+- `alt+Period` go to the right -> (until a comma is hit)
 
 #### Undo/Redo:
 - `alt+z` undo
 - `alt+shift+z` redo
-
-#### Quote:
-- `alt+SingleQuote` go to the right -> (until a quote is hit)
-- `alt+Semicolon` go to the left <- (until a quote is hit)
-
-#### Comma:
-- `alt+Comma` go to the left <- (until a comma is hit)
-- `alt+Period` go to the right -> (until a comma is hit)
 
 #### Here's the json for the keybindings
 
@@ -40,65 +45,75 @@ Ever use Inspect Element on your browser, and navigate the elements using your a
     { "key": "alt+z",       "command": "workbench.action.navigateBack"    },
     { "key": "alt+shift+z", "command": "workbench.action.navigateForward" },
     
-    // 
-    // alt + WASD (technically WASDE)
-    // 
-    { "key": "alt+w",        "command": "mario.moveUp",          "when": "editorTextFocus" },
-    { "key": "alt+a",        "command": "mario.moveToOuter",     "when": "editorTextFocus" },
-    { "key": "alt+s",        "command": "mario.moveDown",        "when": "editorTextFocus" },
-    { "key": "alt+d",        "command": "mario.moveDownToInner", "when": "editorTextFocus" },
-    { "key": "alt+e",        "command": "mario.moveUpToInner",   "when": "editorTextFocus" },
-    { "key": "alt+shift+w",  "command": "mario.selectUp",        "when": "editorTextFocus" },
-    { "key": "alt+shift+s",  "command": "mario.selectDown",      "when": "editorTextFocus" },
+    //
+    // alt+WASD (any os)
+    //
+    { "key": "alt+w",        "command": "mario.moveUp",            "when": "editorTextFocus" },
+    { "key": "alt+shift+w",  "command": "mario.selectUp",          "when": "editorTextFocus" },
+    { "key": "alt+s",        "command": "mario.moveDown",          "when": "editorTextFocus" },
+    { "key": "alt+shift+s",  "command": "mario.selectDown",        "when": "editorTextFocus" },
+    { "key": "alt+a",        "command": "mario.moveToOuter",       "when": "editorTextFocus" },
+    { "key": "alt+shift+a",  "command": "mario.selectToOuter",     "when": "editorTextFocus" },
+    { "key": "alt+d",        "command": "mario.moveDownToInner",   "when": "editorTextFocus" },
+    { "key": "alt+shift+d",  "command": "mario.selectDownToInner", "when": "editorTextFocus" },
+    { "key": "alt+e",        "command": "mario.moveUpToInner",     "when": "editorTextFocus" },
+    { "key": "alt+shift+e",  "command": "mario.selectUpToInner",   "when": "editorTextFocus" },
     
-    // 
-    // (additional option for Mac)
-    // MacOS: ctrl + WASD
-    // 
-    { "key": "ctrl+w",        "command": "mario.moveUp",          "when": "editorTextFocus && isMac" },
-    { "key": "ctrl+a",        "command": "mario.moveToOuter",     "when": "editorTextFocus && isMac" },
-    { "key": "ctrl+s",        "command": "mario.moveDown",        "when": "editorTextFocus && isMac" },
-    { "key": "ctrl+d",        "command": "mario.moveDownToInner", "when": "editorTextFocus && isMac" },
-    { "key": "ctrl+e",        "command": "mario.moveUpToInner",   "when": "editorTextFocus && isMac" },
-    { "key": "ctrl+shift+w",  "command": "mario.selectUp",        "when": "editorTextFocus && isMac" },
-    { "key": "ctrl+shift+s",  "command": "mario.selectDown",      "when": "editorTextFocus && isMac" },
+    //
+    // ctrl+WASD (MacOS)
+    //
+    { "key": "ctrl+w",        "command": "mario.moveUp",            "when": "editorTextFocus && isMac" },
+    { "key": "ctrl+shift+w",  "command": "mario.selectUp",          "when": "editorTextFocus && isMac" },
+    { "key": "ctrl+s",        "command": "mario.moveDown",          "when": "editorTextFocus && isMac" },
+    { "key": "ctrl+shift+s",  "command": "mario.selectDown",        "when": "editorTextFocus && isMac" },
+    { "key": "ctrl+a",        "command": "mario.moveToOuter",       "when": "editorTextFocus && isMac" },
+    { "key": "ctrl+shift+a",  "command": "mario.selectToOuter",     "when": "editorTextFocus && isMac" },
+    { "key": "ctrl+d",        "command": "mario.moveDownToInner",   "when": "editorTextFocus && isMac" },
+    { "key": "ctrl+shift+d",  "command": "mario.selectDownToInner", "when": "editorTextFocus && isMac" },
+    { "key": "ctrl+e",        "command": "mario.moveUpToInner",     "when": "editorTextFocus && isMac" },
+    { "key": "ctrl+shift+e",  "command": "mario.selectUpToInner",   "when": "editorTextFocus && isMac" },
     
-    // 
-    // (arrow keys option)
-    // Linux/Windows: alt  + arrow keys
-    // MacOS:         ctrl + arrow keys
-    // 
-    { "key": "ctrl+up",         "command": "mario.moveUp",          "when": "editorTextFocus && isMac" },
-    { "key": "ctrl+left",       "command": "mario.moveToOuter",     "when": "editorTextFocus && isMac" },
-    { "key": "ctrl+down",       "command": "mario.moveDown",        "when": "editorTextFocus && isMac" },
-    { "key": "ctrl+right",      "command": "mario.moveDownToInner", "when": "editorTextFocus && isMac" },
-    { "key": "ctrl+shift+up",   "command": "mario.selectUp",        "when": "editorTextFocus && isMac" },
-    { "key": "ctrl+shift+down", "command": "mario.selectDown",      "when": "editorTextFocus && isMac" },
-    { "key": "alt+up",          "command": "mario.moveUp",          "when": "editorTextFocus && !isMac" },
-    { "key": "alt+left",        "command": "mario.moveToOuter",     "when": "editorTextFocus && !isMac" },
-    { "key": "alt+down",        "command": "mario.moveDown",        "when": "editorTextFocus && !isMac" },
-    { "key": "alt+right",       "command": "mario.moveDownToInner", "when": "editorTextFocus && !isMac" },
-    { "key": "alt+shift+up",    "command": "mario.selectUp",        "when": "editorTextFocus && !isMac" },
-    { "key": "alt+shift+down",  "command": "mario.selectDown",      "when": "editorTextFocus && !isMac" },
+    //
+    // ctrl+arrows (MacOS)
+    //
+    { "key": "ctrl+up",         "command": "mario.moveUp",            "when": "editorTextFocus && isMac" },
+    { "key": "ctrl+shift+up",   "command": "mario.selectUp",          "when": "editorTextFocus && isMac" },
+    { "key": "ctrl+down",       "command": "mario.moveDown",          "when": "editorTextFocus && isMac" },
+    { "key": "ctrl+shift+down", "command": "mario.selectDown",        "when": "editorTextFocus && isMac" },
+    { "key": "ctrl+left",       "command": "mario.moveToOuter",       "when": "editorTextFocus && isMac" },
+    { "key": "ctrl+shift+left", "command": "mario.selectToOuter",     "when": "editorTextFocus && isMac" },
+    { "key": "ctrl+right",      "command": "mario.moveDownToInner",   "when": "editorTextFocus && isMac" },
+    { "key": "ctrl+shift+right","command": "mario.selectDownToInner", "when": "editorTextFocus && isMac" },
     
-    // 
-    // jump/select to comma
-    // 
+    //
+    // alt+arrows (Linux/Windows)
+    //
+    { "key": "alt+up",          "command": "mario.moveUp",            "when": "editorTextFocus && !isMac" },
+    { "key": "alt+shift+up",    "command": "mario.selectUp",          "when": "editorTextFocus && !isMac" },
+    { "key": "alt+down",        "command": "mario.moveDown",          "when": "editorTextFocus && !isMac" },
+    { "key": "alt+shift+down",  "command": "mario.selectDown",        "when": "editorTextFocus && !isMac" },
+    { "key": "alt+left",        "command": "mario.moveToOuter",       "when": "editorTextFocus && !isMac" },
+    { "key": "alt+shift+left",  "command": "mario.selectToOuter",     "when": "editorTextFocus && !isMac" },
+    { "key": "alt+right",       "command": "mario.moveDownToInner",   "when": "editorTextFocus && !isMac" },
+    { "key": "alt+shift+right", "command": "mario.selectDownToInner", "when": "editorTextFocus && !isMac" },
+    
+    //
+    // Commas
+    //
     { "key": "alt+.",       "command": "mario.nextComma",           "when": "editorTextFocus" },
-    { "key": "alt+,",       "command": "mario.previousComma",       "when": "editorTextFocus" },
     { "key": "alt+shift+.", "command": "mario.selectNextComma",     "when": "editorTextFocus" },
+    { "key": "alt+,",       "command": "mario.previousComma",       "when": "editorTextFocus" },
     { "key": "alt+shift+,", "command": "mario.selectPreviousComma", "when": "editorTextFocus" },
     
-    // 
-    // jump/select to quote
-    // 
+    //
+    // Quotes
+    //
     { "key": "alt+'",       "command": "mario.nextQuote",           "when": "editorTextFocus" },
+    { "key": "alt+shift+'", "command": "mario.selectNextQuote",     "when": "editorTextFocus" },
     { "key": "alt+;",       "command": "mario.previousQuote",       "when": "editorTextFocus" },
-    { "key": "alt+shift+.", "command": "mario.selectNextQuote",     "when": "editorTextFocus" },
-    { "key": "alt+shift+,", "command": "mario.selectPreviousQuote", "when": "editorTextFocus" },
+    { "key": "alt+shift+;", "command": "mario.selectPreviousQuote", "when": "editorTextFocus" }
 ```
 
 ## ToDo / Bugs
 
-- Select-out and select-in haven't been implemented yet
 - Fix/improve the built-in jump-to-bracket and select-to-bracket
