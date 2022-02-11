@@ -10,22 +10,27 @@ Ever use Inspect Element on your browser, and navigate the elements using your a
 1. Install the extension on VS Code
 2. Learn the keyboard shortcuts!
 
-Here's the default shortcuts <br>
-Blocks:
+### Here's the default shortcuts
+
+#### Blocks:
 - `ctrl+wasd` on Mac, `cmd+wasd` on Linux
 - `ctrl+ArrowKeys` on Mac, `cmd+ArrowKeys` on Linux
 
-Undo/Redo:
+#### Undo/Redo:
 - `alt+z` undo
 - `alt+shift+z` redo
 
-Quote:
+#### Quote:
 - `alt+SingleQuote` go to the right -> (until a quote is hit)
 - `alt+Semicolon` go to the left <- (until a quote is hit)
 
-Comma:
+#### Comma:
 - `alt+Comma` go to the left <- (until a comma is hit)
 - `alt+Period` go to the right -> (until a comma is hit)
+
+#### Here's the json for the keybindings
+
+(useful for changing/disabiling multiple)
 
 ```jsonc
     // 
