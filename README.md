@@ -8,9 +8,25 @@ Ever use Inspect Element on your browser, and navigate the elements using your a
 
 ## How Do I Use It?
 1. Install the extension on VS Code
-2. Add Keyboard shortcuts (copy and paste below, or make your own)
+2. Learn the keyboard shortcuts!
 
-To use the following shortcuts, do (cmd/ctrl)+P then type "Preferences: Open Keyboard Shortcuts (JSON)" then pick and choose what kind of keybindings you want below.
+Here's the default shortcuts <br>
+Blocks:
+- `ctrl+wasd` on Mac, `cmd+wasd` on Linux
+- `ctrl+ArrowKeys` on Mac, `cmd+ArrowKeys` on Linux
+
+Undo/Redo:
+- `alt+z` undo
+- `alt+shift+z` redo
+
+Quote:
+- `alt+SingleQuote` go to the right -> (until a quote is hit)
+- `alt+Semicolon` go to the left <- (until a quote is hit)
+
+Comma:
+- `alt+Comma` go to the left <- (until a comma is hit)
+- `alt+Period` go to the right -> (until a comma is hit)
+
 ```jsonc
     // 
     // undo / redo jump
@@ -75,15 +91,6 @@ To use the following shortcuts, do (cmd/ctrl)+P then type "Preferences: Open Key
     { "key": "alt+;",       "command": "mario.previousQuote",       "when": "editorTextFocus" },
     { "key": "alt+shift+.", "command": "mario.selectNextQuote",     "when": "editorTextFocus" },
     { "key": "alt+shift+,", "command": "mario.selectPreviousQuote", "when": "editorTextFocus" },
-    
-    // 
-    // jump/select to bracket
-    // (built-in commands, but these shortcuts play nice with other shortcuts)
-    // 
-    { "key": "alt+]",       "command": "mario.nextBracket",           "when": "editorTextFocus" },
-    { "key": "alt+[",       "command": "mario.previousBracket",       "when": "editorTextFocus" },
-    { "key": "alt+shift+]", "command": "mario.selectNextBracket",     "when": "editorTextFocus" },
-    { "key": "alt+shift+[", "command": "mario.selectPreviousBracket", "when": "editorTextFocus" },
 ```
 
 ## ToDo / Bugs

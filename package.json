@@ -2,7 +2,7 @@
     "name": "mario",
     "displayName": "Mario: The Block Jumper Extension",
     "description": "Cursor movement for speedrunners and pros",
-    "version": "2.1.1",
+    "version": "2.2.0",
     "icon": "icon.png",
     "publisher": "jeff-hykin",
     "repository": {
@@ -109,10 +109,52 @@
                 "command": "mario.selectPreviousComma",
                 "title": "Mario: Select To Previous Comma"
             }
+        ],
+        "keybindings": [
+            { "key": "alt+z",       "command": "workbench.action.navigateBack"    },
+            { "key": "alt+shift+z", "command": "workbench.action.navigateForward" },
+            
+            { "key": "alt+w",        "command": "mario.moveUp",          "when": "editorTextFocus" },
+            { "key": "alt+a",        "command": "mario.moveToOuter",     "when": "editorTextFocus" },
+            { "key": "alt+s",        "command": "mario.moveDown",        "when": "editorTextFocus" },
+            { "key": "alt+d",        "command": "mario.moveDownToInner", "when": "editorTextFocus" },
+            { "key": "alt+e",        "command": "mario.moveUpToInner",   "when": "editorTextFocus" },
+            { "key": "alt+shift+w",  "command": "mario.selectUp",        "when": "editorTextFocus" },
+            { "key": "alt+shift+s",  "command": "mario.selectDown",      "when": "editorTextFocus" },
+            
+            { "key": "ctrl+w",        "command": "mario.moveUp",          "when": "editorTextFocus && isMac" },
+            { "key": "ctrl+a",        "command": "mario.moveToOuter",     "when": "editorTextFocus && isMac" },
+            { "key": "ctrl+s",        "command": "mario.moveDown",        "when": "editorTextFocus && isMac" },
+            { "key": "ctrl+d",        "command": "mario.moveDownToInner", "when": "editorTextFocus && isMac" },
+            { "key": "ctrl+e",        "command": "mario.moveUpToInner",   "when": "editorTextFocus && isMac" },
+            { "key": "ctrl+shift+w",  "command": "mario.selectUp",        "when": "editorTextFocus && isMac" },
+            { "key": "ctrl+shift+s",  "command": "mario.selectDown",      "when": "editorTextFocus && isMac" },
+            
+            { "key": "ctrl+up",         "command": "mario.moveUp",          "when": "editorTextFocus && isMac" },
+            { "key": "ctrl+left",       "command": "mario.moveToOuter",     "when": "editorTextFocus && isMac" },
+            { "key": "ctrl+down",       "command": "mario.moveDown",        "when": "editorTextFocus && isMac" },
+            { "key": "ctrl+right",      "command": "mario.moveDownToInner", "when": "editorTextFocus && isMac" },
+            { "key": "ctrl+shift+up",   "command": "mario.selectUp",        "when": "editorTextFocus && isMac" },
+            { "key": "ctrl+shift+down", "command": "mario.selectDown",      "when": "editorTextFocus && isMac" },
+            { "key": "alt+up",          "command": "mario.moveUp",          "when": "editorTextFocus && !isMac" },
+            { "key": "alt+left",        "command": "mario.moveToOuter",     "when": "editorTextFocus && !isMac" },
+            { "key": "alt+down",        "command": "mario.moveDown",        "when": "editorTextFocus && !isMac" },
+            { "key": "alt+right",       "command": "mario.moveDownToInner", "when": "editorTextFocus && !isMac" },
+            { "key": "alt+shift+up",    "command": "mario.selectUp",        "when": "editorTextFocus && !isMac" },
+            { "key": "alt+shift+down",  "command": "mario.selectDown",      "when": "editorTextFocus && !isMac" },
+            
+            { "key": "alt+.",       "command": "mario.nextComma",           "when": "editorTextFocus" },
+            { "key": "alt+,",       "command": "mario.previousComma",       "when": "editorTextFocus" },
+            { "key": "alt+shift+.", "command": "mario.selectNextComma",     "when": "editorTextFocus" },
+            { "key": "alt+shift+,", "command": "mario.selectPreviousComma", "when": "editorTextFocus" },
+            
+            { "key": "alt+'",       "command": "mario.nextQuote",           "when": "editorTextFocus" },
+            { "key": "alt+;",       "command": "mario.previousQuote",       "when": "editorTextFocus" },
+            { "key": "alt+shift+.", "command": "mario.selectNextQuote",     "when": "editorTextFocus" },
+            { "key": "alt+shift+,", "command": "mario.selectPreviousQuote", "when": "editorTextFocus" }
         ]
     },
-    "scripts": {
-    },
+    "scripts": {},
     "devDependencies": {
         "vscode": "^1.0.0"
     }
