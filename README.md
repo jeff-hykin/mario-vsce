@@ -86,16 +86,16 @@ You can paste chunks of the code below in your `keybindings.json` if you want to
     { "key": "ctrl+shift+right","command": "-mario.selectDownToInner", "when": "editorTextFocus && isMac" },
     
     //
-    // alt+arrows (Linux/Windows)
+    // alt+ctrl+arrows (Linux/Windows)
     //
-    { "key": "alt+up",          "command": "-mario.moveUp",            "when": "editorTextFocus && !isMac" },
-    { "key": "alt+shift+up",    "command": "-mario.selectUp",          "when": "editorTextFocus && !isMac" },
-    { "key": "alt+down",        "command": "-mario.moveDown",          "when": "editorTextFocus && !isMac" },
-    { "key": "alt+shift+down",  "command": "-mario.selectDown",        "when": "editorTextFocus && !isMac" },
-    { "key": "alt+left",        "command": "-mario.moveToOuter",       "when": "editorTextFocus && !isMac" },
-    { "key": "alt+shift+left",  "command": "-mario.selectToOuter",     "when": "editorTextFocus && !isMac" },
-    { "key": "alt+right",       "command": "-mario.moveDownToInner",   "when": "editorTextFocus && !isMac" },
-    { "key": "alt+shift+right", "command": "-mario.selectDownToInner", "when": "editorTextFocus && !isMac" },
+    { "key": "alt+ctrl+up",          "command": "-mario.moveUp",            "when": "editorTextFocus && !isMac" },
+    { "key": "alt+ctrl+shift+up",    "command": "-mario.selectUp",          "when": "editorTextFocus && !isMac" },
+    { "key": "alt+ctrl+down",        "command": "-mario.moveDown",          "when": "editorTextFocus && !isMac" },
+    { "key": "alt+ctrl+shift+down",  "command": "-mario.selectDown",        "when": "editorTextFocus && !isMac" },
+    { "key": "alt+ctrl+left",        "command": "-mario.moveToOuter",       "when": "editorTextFocus && !isMac" },
+    { "key": "alt+ctrl+shift+left",  "command": "-mario.selectToOuter",     "when": "editorTextFocus && !isMac" },
+    { "key": "alt+ctrl+right",       "command": "-mario.moveDownToInner",   "when": "editorTextFocus && !isMac" },
+    { "key": "alt+ctrl+shift+right", "command": "-mario.selectDownToInner", "when": "editorTextFocus && !isMac" },
     
     //
     // Commas
