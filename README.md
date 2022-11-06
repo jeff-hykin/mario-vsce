@@ -19,7 +19,7 @@ Ever use Inspect Element on your browser, and navigate the elements using your a
 - `alt+WASD` (Mac/Linux/Windows)
 - `ctrl+WASD` (Mac)
 - `ctrl+ArrowKeys` (Mac)
-- `alt+ArrowKeys` (Linux/Windows)
+- `alt+ctrl+ArrowKeys` (Linux/Windows)
 
 #### Quote Jump:
 - `alt+SingleQuote` go to the right -> (until a quote is hit)
