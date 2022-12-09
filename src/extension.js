@@ -3,7 +3,7 @@ let vscode = require("vscode")
 
 // a global-for-this-file var that is updated when called on a new active document
 const activeFile = {
-    tabSize: null,
+    tabSize: 1, // this used to be based on settings, but behavior is more generic with tab size of 1
     lineIndentCache: {},
     indexIsInBounds: ()=>0,
     
@@ -233,8 +233,6 @@ function cursorUpOrDownBlock({direction, startingLineIndex, upperBound, lowerBou
 
 function cursorJumpBlock({direction, shouldSelectRange, }) {
     try {
-        // update the editor
-        activeFile.tabSize = activeFile.editor.options.tabSize
         activeFile.lineIndentCache = {}
         // NOTE: bit of a misnomer cause the upperBound is the BOTTOM of the file (but its a larger line number)
         const upperBound = activeFile.lineCount - 1

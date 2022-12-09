@@ -35,7 +35,9 @@ Ever use Inspect Element on your browser, and navigate the elements using your a
 
 #### Here's the json for the keybindings
 
-You can paste chunks of the code below in your `keybindings.json` if you want to mass-disable some of the keybindings.
+These keybindings are enabled BY DEFAULT.<br>
+Here's some code for mass-DISABLING keybindings that you don't want.<br>
+You can paste chunks of the code below in your `keybindings.json`.
 
 ```jsonc
     // 
