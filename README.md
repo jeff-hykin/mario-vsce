@@ -29,7 +29,7 @@ Ever use Inspect Element on your browser, and navigate the elements using your a
 - `alt+Comma` go to the left <- (until a comma is hit)
 - `alt+Period` go to the right -> (until a comma is hit)
 
-#### Undo/Redo:
+#### Undo/Redo Jump:
 - `alt+z` undo
 - `alt+shift+z` redo
 
