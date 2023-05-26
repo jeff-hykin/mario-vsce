@@ -348,6 +348,16 @@
                 "key": "alt+shift+;",
                 "command": "mario.selectPreviousQuote",
                 "when": "editorTextFocus"
+            },
+            {
+                "key": "alt+shift+ ",
+                "command": "mario.spaceSelectMode",
+                "when": "editorTextFocus"
+            },
+            {
+                "key": "alt+ ",
+                "command": "mario.spaceMode",
+                "when": "editorTextFocus"
             }
         ]
     },

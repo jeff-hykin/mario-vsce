@@ -1,6 +1,11 @@
 let readline = require("readline")
 let vscode = require("vscode")
 
+const status = {
+    spaceMode: false,
+    spaceSelectMode: false,
+}
+
 // a global-for-this-file var that is updated when called on a new active document
 const activeFile = {
     tabSize: 1, // this used to be based on settings, but behavior is more generic with tab size of 1
@@ -437,8 +442,61 @@ function findNext({pattern, goBackwards=false, startingCharacterIndex=null, star
     return {characterIndex, lineIndex}
 }
 
+vscode.keybindingManager = vscode.keybindingManager || {}
+vscode.keybindingManager.listeners = vscode.keybindingManager.listeners || new Set()
+vscode.keybindingManager.setup = (context)=>{
+    if (!vscode.keybindingManager.command) {
+        vscode.keybindingManager.command = vscode.commands.registerCommand('type', async (...args) => {
+            let noneActivated = true
+            for (const each of vscode.keybindingManager.listeners) {
+                try {
+                    if (await each(args)) {
+                        noneActivated = false
+                    }
+                } catch (error) {
+                    console.error(`Error with keybindingManager.listener: ${each}`, error)
+                }
+            }
+            // perform the default action if none activated
+            if (noneActivated) {
+                vscode.commands.executeCommand('default:type', ...args)
+            }
+        })
+        context.subscriptions.push(vscode.keybindingManager.command)
+    }
+}
+
+const keypressListener = ({text})=> {
+    if (status.spaceMode) {
+        status.spaceMode = false
+        // TODO: make this customizable
+        // NOTE: must be letters, can't be bound to arrows or meta-keys like ctrl/shift/alt
+        if (text == "d") {
+            vscode.commands.executeCommand("mario.nextSpace")
+            return true
+        } else if (text == "a") {
+            vscode.commands.executeCommand("mario.previousSpace")
+            return true
+        }
+    }
+    if (status.spaceSelectMode) {
+        status.spaceSelectMode = false
+        // TODO: make this customizable
+        // NOTE: must be letters, can't be bound to arrows or meta-keys like ctrl/shift/alt
+        if (text == "d") {
+            vscode.commands.executeCommand("mario.selectNextSpace")
+            return true
+        } else if (text == "a") {
+            vscode.commands.executeCommand("mario.selectPreviousSpace")
+            return true
+        }
+    }
+}
+
 module.exports = {
     activate(context) {
+        vscode.keybindingManager.setup(context)
+        vscode.keybindingManager.listeners.add(keypressListener)
         const newCommand = ({name, command}) => {
             console.debug(`creating command: ${name}`)
             context.subscriptions.push(vscode.commands.registerCommand("mario."+name, command))
@@ -454,6 +512,8 @@ module.exports = {
         newCommand({       name:"selectUpToInner"  , command: ()=>cursorJumpBlock({ direction: "rightUp",   shouldSelectRange:true, })       })
         newCommand({       name:"moveDownToInner"  , command: ()=>cursorJumpBlock({ direction: "rightDown",                         })       })
         newCommand({       name:"selectDownToInner", command: ()=>cursorJumpBlock({ direction: "rightDown", shouldSelectRange:true, })       })
+        newCommand({       name:"spaceMode"        , command: ()=>{ status.spaceMode = true }  })
+        newCommand({       name:"spaceSelectMode"  , command: ()=>{ status.spaceSelectMode = true }  })
         
         function nextFinder(name, pattern) {
             const genericFindNextFunction = ({ goBackwards, shouldSelectRange }) => {
@@ -470,9 +530,10 @@ module.exports = {
             newCommand({ name: `selectNext${name}`     , command: ()=>genericFindNextFunction({ goBackwards: false, shouldSelectRange: true , }) })
             newCommand({ name: `selectPrevious${name}` , command: ()=>genericFindNextFunction({ goBackwards: true , shouldSelectRange: true , }) })
         }
-
+            
         nextFinder("Quote", /"|'|`/) // TODO: make quote know which quote it is matching (when finding more quotes in a selection)
         nextFinder("Comma", /,/)
+        nextFinder("Space", / |\t|\n|\r|$|^/)
     },
 
     deactivate() {
