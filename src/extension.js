@@ -6,6 +6,16 @@ const status = {
     spaceSelectMode: false,
 }
 
+const range = ({start, end})=>{
+    const outputs = []
+    let index = start
+    while (index < end) {
+        outputs.push(index)
+        index += 1
+    }
+    return outputs
+}
+
 // a global-for-this-file var that is updated when called on a new active document
 const activeFile = {
     tabSize: 1, // this used to be based on settings, but behavior is more generic with tab size of 1
@@ -302,7 +312,7 @@ function cursorJumpBlock({direction, shouldSelectRange, }) {
 }
 
 /**
- * Function that does something
+ * changeCursorSelections
  *
  * @param {[{lineIndex, characterIndex,}]} args.newCursorRanges - what should be selected
  * @param {Boolean} [args.shouldSelectRange=true] - if ranges are desired
@@ -371,29 +381,31 @@ function changeCursorSelections({ newCursorRanges, shouldSelectRange=false }) {
 }
 
 function regexFindAll(regexPattern, sourceString) {
-    let output = []
-    let match
-    // make sure the pattern has the global flag
-    let regexPatternWithGlobal = RegExp(regexPattern,'g'+regexPattern.flags)
+    var output = []
+    var match
+    // auto-add global flag while keeping others as-is
+    var regexPatternWithGlobal = regexPattern.global ? regexPattern : RegExp(regexPattern, regexPattern.flags+"g")
     while (match = regexPatternWithGlobal.exec(sourceString)) {
-        // get rid of the string copy
-        delete match.input
         // store the match data
         output.push(match)
-    } 
+        // zero-length matches will end up in an infinite loop, so increment by one char after a zero-length match is found
+        if (match[0].length == 0) {
+            regexPatternWithGlobal.lastIndex += 1
+        }
+    }
     return output
 }
 
 function findNext({pattern, goBackwards=false, startingCharacterIndex=null, startingLineIndex=null, selection=null}) {
     // process args
     if (selection == null) { selection = vscode.window.activeTextEditor.selection }
-    const searchStartCharacterIndex = startingCharacterIndex == null ? selection.active.character : startingCharacterIndex
-    const searchStartLineIndex      = startingLineIndex      == null ? selection.active.line      : startingLineIndex
+    const cursorCharacterIndex = startingCharacterIndex == null ? selection.active.character : startingCharacterIndex
+    const cursorLineIndex      = startingLineIndex      == null ? selection.active.line      : startingLineIndex
     
     // setup
     const editor = vscode.window.activeTextEditor
-    let characterIndex = searchStartCharacterIndex
-    let lineIndex      = searchStartLineIndex
+    let characterIndex = cursorCharacterIndex
+    let lineIndex      = cursorLineIndex
     const directionNumber = goBackwards ? -1 : 1
     
     // now try to find the next lineIndex and characterIndex
@@ -403,38 +415,84 @@ function findNext({pattern, goBackwards=false, startingCharacterIndex=null, star
             lineIndex += directionNumber
             var lineContent = activeFile.lineAt(lineIndex).text
         } catch (error) {
-            lineIndex = searchStartLineIndex
-            characterIndex = searchStartCharacterIndex
+            // stay in-place on no matches
+            lineIndex = cursorLineIndex
+            characterIndex = cursorCharacterIndex
             break mainLoop
         }
         let matches = regexFindAll(pattern, lineContent)
-        if (matches.length > 0) {
-            if (!goBackwards) {
-                for (let eachMatch of matches) {
-                    if (lineIndex == searchStartLineIndex) {
-                        // must be after starting position
-                        if (eachMatch.index > searchStartCharacterIndex) {
-                            characterIndex = eachMatch.index
-                            break mainLoop
-                        }
-                    } else {
-                        characterIndex = eachMatch.index
-                        break mainLoop
-                    }
+        // if there are no matches, go to the next line
+        if (matches.length == 0) {
+            continue
+        }
+        // if on different lines, then any match will do (characterIndex doesn't matter)
+        if (lineIndex != cursorLineIndex) {
+            characterIndex = eachMatch.index
+            break mainLoop
+        }
+        // if on the same line, then it depends
+        if (goBackwards) {
+            // cursor must not be touching the match, and must be before the match
+            // commented-out code below explains it best, and the not-commented-out for-loop below should be just a more efficient version of the filter
+            // matches = matches.filter(each=>{
+            //     const indicesTouchingItem = range({
+            //         start: each.index,                // inclusive start
+            //         end: each.index + each[0].length, // non-inclusive end
+            //     })
+            //     if (indicesTouchingItem.includes(cursorCharacterIndex)) {
+            //         return false
+            //     } else if (Math.max(indicesTouchingItem) < cursorCharacterIndex) {
+            //         return true
+            //     } else {
+            //         return false
+            //     }
+            // })
+            for (const eachMatch of matches.reverse()) {
+                // cursor = 3
+                // matchRange = [1,2] => dont skip
+                // matchRange = [2,3] => skip
+                // matchRange = [3,4] => skip
+                // matchRange = [4,5] => skip
+                const rangeEnd = eachMatch.index + eachMatch[0].length
+                // is either touching the match, or match is too far Left of the cursor
+                if (rangeEnd >= cursorCharacterIndex) {
+                    continue
                 }
-            } else {
-                for (let eachMatch of matches.reverse()) {
-                    if (lineIndex == searchStartLineIndex) {
-                        // must be before starting position
-                        if (eachMatch.index < searchStartCharacterIndex-1) {
-                            characterIndex = eachMatch.index+1
-                            break mainLoop
-                        }
-                    } else {
-                        characterIndex = eachMatch.index+1
-                        break mainLoop
-                    }
+                // else found a valid match
+                characterIndex = rangeEnd // go to nearest part of the match
+                break mainLoop
+            }
+        // not-goBackwards
+        } else {
+            // cursor must not be touching the match, and must be after the match
+            // commented-out code below explains it best, and the not-commented-out for-loop should be just a more efficient version of the filter
+            // matches = matches.filter(each=>{
+            //     const indicesTouchingItem = range({
+            //         start: each.index,                // inclusive start
+            //         end: each.index + each[0].length, // non-inclusive end
+            //     })
+            //     if (indicesTouchingItem.includes(cursorCharacterIndex)) {
+            //         return false
+            //     } else if (Math.min(indicesTouchingItem) > cursorCharacterIndex) {
+            //         return true
+            //     } else {
+            //         return false
+            //     }
+            // })
+            for (const eachMatch of matches) {
+                // cursor = 3
+                // matchRange = [4,5] => dont skip
+                // matchRange = [3,4] => skip
+                // matchRange = [2,3] => skip
+                // matchRange = [1,2] => skip
+                const rangeStart = eachMatch.index
+                // is either touching the match, or match is behind cursor
+                if (rangeStart <= cursorCharacterIndex) {
+                    continue
                 }
+                // else found a valid match
+                characterIndex = rangeStart // go to nearest part of the match
+                break mainLoop
             }
         }
     }
@@ -466,15 +524,18 @@ vscode.keybindingManager.setup = (context)=>{
     }
 }
 
-const keypressListener = ({text})=> {
+// NOTE: this is unused, was designed to be a multi-key shortcut solution (or a hack for chorded keyboard shortcuts) but it is unfinished
+const keypressListener = (arg)=> {
     if (status.spaceMode) {
+        let text = arg.text || arg['0'].text // no idea why VS Code does this
         status.spaceMode = false
         // TODO: make this customizable
         // NOTE: must be letters, can't be bound to arrows or meta-keys like ctrl/shift/alt
-        if (text == "d") {
+        if (text == "d" || text == "δ") {
             vscode.commands.executeCommand("mario.nextSpace")
+            console.log("went to nextSpace")
             return true
-        } else if (text == "a") {
+        } else if (text == "a" || text == "𝝰") {
             vscode.commands.executeCommand("mario.previousSpace")
             return true
         }
@@ -495,8 +556,11 @@ const keypressListener = ({text})=> {
 
 module.exports = {
     activate(context) {
-        vscode.keybindingManager.setup(context)
-        vscode.keybindingManager.listeners.add(keypressListener)
+        // NOTE: this commented out part was designed to be a multi-key shortcut solution (or a hack for chorded keyboard shortcuts) but it is unfinished
+        // vscode.keybindingManager.setup(context)
+        // vscode.keybindingManager.listeners.add(keypressListener)
+
+        "afsdafasdadsfsdafsad", "adfasdf"
         const newCommand = ({name, command}) => {
             console.debug(`creating command: ${name}`)
             context.subscriptions.push(vscode.commands.registerCommand("mario."+name, command))
@@ -512,14 +576,15 @@ module.exports = {
         newCommand({       name:"selectUpToInner"  , command: ()=>cursorJumpBlock({ direction: "rightUp",   shouldSelectRange:true, })       })
         newCommand({       name:"moveDownToInner"  , command: ()=>cursorJumpBlock({ direction: "rightDown",                         })       })
         newCommand({       name:"selectDownToInner", command: ()=>cursorJumpBlock({ direction: "rightDown", shouldSelectRange:true, })       })
-        newCommand({       name:"spaceMode"        , command: ()=>{ status.spaceMode = true }  })
-        newCommand({       name:"spaceSelectMode"  , command: ()=>{ status.spaceSelectMode = true }  })
+        newCommand({       name:"spaceMode"        , command: ()=>{ status.spaceMode = true      ; console.log("activatingSpaceMode") }  })
+        newCommand({       name:"spaceSelectMode"  , command: ()=>{ status.spaceSelectMode = true; console.log("activatingSpaceMode") }  })
         
         function nextFinder(name, pattern) {
             const genericFindNextFunction = ({ goBackwards, shouldSelectRange }) => {
                 try {
                     const editor = vscode.window.activeTextEditor
                     let newCursorRanges = editor.selections.map(eachSelection => findNext({pattern: pattern, selection: eachSelection, goBackwards,}))
+                    console.debug(`newCursorRanges is:`,newCursorRanges)
                     changeCursorSelections({ newCursorRanges, shouldSelectRange })
                 } catch (error) {
                     console.debug(`mario.${name} error is:`,error)

@@ -29,6 +29,10 @@ Ever use Inspect Element on your browser, and navigate the elements using your a
 - `alt+Comma` go to the left <- (until a comma is hit)
 - `alt+Period` go to the right -> (until a comma is hit)
 
+#### Whitespace Jump:
+- `alt+Comma` go to the left <- (until a comma is hit)
+- `alt+Period` go to the right -> (until a comma is hit)
+
 #### Undo/Redo Jump:
 - `alt+z` undo
 - `alt+shift+z` redo
@@ -114,6 +118,14 @@ You can paste chunks of the code below in your `keybindings.json`.
     { "key": "alt+shift+'", "command": "-mario.selectNextQuote",     "when": "editorTextFocus" },
     { "key": "alt+;",       "command": "-mario.previousQuote",       "when": "editorTextFocus" },
     { "key": "alt+shift+;", "command": "-mario.selectPreviousQuote", "when": "editorTextFocus" }
+    
+    //
+    // Whitespace
+    //
+    { "key": "ctrl+]",       "command": "-mario.nextSpace",           "when": "editorTextFocus" },
+    { "key": "ctrl+shift+]", "command": "-mario.selectNextSpace",     "when": "editorTextFocus" },
+    { "key": "ctrl+[",       "command": "-mario.previousSpace",       "when": "editorTextFocus" },
+    { "key": "ctrl+shift+[", "command": "-mario.selectPreviousSpace", "when": "editorTextFocus" }
 ```
 
 ## ToDo / Bugs

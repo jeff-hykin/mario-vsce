@@ -350,13 +350,23 @@
                 "when": "editorTextFocus"
             },
             {
-                "key": "alt+shift+ ",
-                "command": "mario.spaceSelectMode",
+                "key": "ctrl+]",
+                "command": "mario.nextSpace",
                 "when": "editorTextFocus"
             },
             {
-                "key": "alt+ ",
-                "command": "mario.spaceMode",
+                "key": "ctrl+shift+]",
+                "command": "mario.selectNextSpace",
+                "when": "editorTextFocus"
+            },
+            {
+                "key": "ctrl+[",
+                "command": "mario.previousSpace",
+                "when": "editorTextFocus"
+            },
+            {
+                "key": "ctrl+shift+[",
+                "command": "mario.selectPreviousSpace",
                 "when": "editorTextFocus"
             }
         ]
