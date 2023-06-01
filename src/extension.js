@@ -410,6 +410,7 @@ function findNext({pattern, goBackwards=false, startingCharacterIndex=null, star
     
     // now try to find the next lineIndex and characterIndex
     lineIndex -= directionNumber // offset the begining becase the ++ is done at the top of the loop
+    let endOfTouchedMatch = null
     mainLoop: while (true) {
         try {
             lineIndex += directionNumber
@@ -418,6 +419,11 @@ function findNext({pattern, goBackwards=false, startingCharacterIndex=null, star
             // stay in-place on no matches
             lineIndex = cursorLineIndex
             characterIndex = cursorCharacterIndex
+            // if touching a match, not at the end of the match, and no more matches after
+            // then jump to the end of the being-touched match
+            if (endOfTouchedMatch !== null) {
+                characterIndex = endOfTouchedMatch
+            }
             break mainLoop
         }
         let matches = regexFindAll(pattern, lineContent)
@@ -453,9 +459,14 @@ function findNext({pattern, goBackwards=false, startingCharacterIndex=null, star
                 // matchRange = [2,3] => skip
                 // matchRange = [3,4] => skip
                 // matchRange = [4,5] => skip
+                const rangeStart = eachMatch.index
                 const rangeEnd = eachMatch.index + eachMatch[0].length
                 // is either touching the match, or match is too far Left of the cursor
                 if (rangeEnd >= cursorCharacterIndex) {
+                    // if touching a match, and not all-the-way-at-the-start remeber it for maybe-use later
+                    if (rangeStart < cursorCharacterIndex) {
+                        endOfTouchedMatch = rangeStart
+                    }
                     continue
                 }
                 // else found a valid match
@@ -486,8 +497,13 @@ function findNext({pattern, goBackwards=false, startingCharacterIndex=null, star
                 // matchRange = [2,3] => skip
                 // matchRange = [1,2] => skip
                 const rangeStart = eachMatch.index
+                const rangeEnd = eachMatch.index + eachMatch[0].length
                 // is either touching the match, or match is behind cursor
                 if (rangeStart <= cursorCharacterIndex) {
+                    // if touching a match, and not all-the-way-at-the-end remeber it for maybe-use later
+                    if (rangeEnd > cursorCharacterIndex) {
+                        endOfTouchedMatch = rangeEnd
+                    }
                     continue
                 }
                 // else found a valid match
