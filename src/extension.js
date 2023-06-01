@@ -549,7 +549,6 @@ const keypressListener = (arg)=> {
         // NOTE: must be letters, can't be bound to arrows or meta-keys like ctrl/shift/alt
         if (text == "d" || text == "δ") {
             vscode.commands.executeCommand("mario.nextSpace")
-            console.log("went to nextSpace")
             return true
         } else if (text == "a" || text == "𝝰") {
             vscode.commands.executeCommand("mario.previousSpace")
@@ -576,9 +575,8 @@ module.exports = {
         // vscode.keybindingManager.setup(context)
         // vscode.keybindingManager.listeners.add(keypressListener)
 
-        "afsdafasdadsfsdafsad", "adfasdf"
         const newCommand = ({name, command}) => {
-            console.debug(`creating command: ${name}`)
+            console.log(`creating command: ${name}`)
             context.subscriptions.push(vscode.commands.registerCommand("mario."+name, command))
         }
         
@@ -592,15 +590,14 @@ module.exports = {
         newCommand({       name:"selectUpToInner"  , command: ()=>cursorJumpBlock({ direction: "rightUp",   shouldSelectRange:true, })       })
         newCommand({       name:"moveDownToInner"  , command: ()=>cursorJumpBlock({ direction: "rightDown",                         })       })
         newCommand({       name:"selectDownToInner", command: ()=>cursorJumpBlock({ direction: "rightDown", shouldSelectRange:true, })       })
-        newCommand({       name:"spaceMode"        , command: ()=>{ status.spaceMode = true      ; console.log("activatingSpaceMode") }  })
-        newCommand({       name:"spaceSelectMode"  , command: ()=>{ status.spaceSelectMode = true; console.log("activatingSpaceMode") }  })
+        newCommand({       name:"spaceMode"        , command: ()=>{ status.spaceMode = true      ; console.log("activatingSpaceMode") }  }) // NOTE: part of unfinished feature
+        newCommand({       name:"spaceSelectMode"  , command: ()=>{ status.spaceSelectMode = true; console.log("activatingSpaceMode") }  }) // NOTE: part of unfinished feature
         
         function nextFinder(name, pattern) {
             const genericFindNextFunction = ({ goBackwards, shouldSelectRange }) => {
                 try {
                     const editor = vscode.window.activeTextEditor
                     let newCursorRanges = editor.selections.map(eachSelection => findNext({pattern: pattern, selection: eachSelection, goBackwards,}))
-                    console.debug(`newCursorRanges is:`,newCursorRanges)
                     changeCursorSelections({ newCursorRanges, shouldSelectRange })
                 } catch (error) {
                     console.debug(`mario.${name} error is:`,error)
