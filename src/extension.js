@@ -328,7 +328,7 @@ function changeCursorSelections({ newCursorRanges, shouldSelectRange=false }) {
         // provide default values
         if (trailingCharacterIndex == null && trailingLineIndex == null) {
             if (shouldSelectRange) {
-                const activeCursorIsAtEnd = selection.active.line === selection.end.line
+                const activeCursorIsAtEnd = selection.active.line === selection.end.line && selection.active.character === selection.end.character
                 // begining of the selection is the opposite side of the active cursor
                 if (activeCursorIsAtEnd) {
                     trailingCharacterIndex = selection.start.character
