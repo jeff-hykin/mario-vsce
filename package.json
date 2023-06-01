@@ -1,382 +1,391 @@
 {
-    "name": "mario",
-    "displayName": "Mario: The Block Jumper Extension",
-    "description": "Cursor movement for speedrunners and pros",
-    "version": "2.3.0",
-    "icon": "icon.png",
-    "publisher": "jeff-hykin",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/jeff-hykin/mario-vsce.git"
-    },
-    "engines": {
-        "vscode": "^1.5.0"
-    },
-    "keywords": [
-        "jumper",
-        "jumpy",
-        "cursor",
-        "block",
-        "jump",
-        "navigate",
-        "code"
+  "name": "mario",
+  "displayName": "Mario: The Block Jumper Extension",
+  "description": "Cursor movement for speedrunners and pros",
+  "version": "2.3.0",
+  "icon": "icon.png",
+  "publisher": "jeff-hykin",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeff-hykin/mario-vsce.git"
+  },
+  "engines": {
+    "vscode": "^1.5.0"
+  },
+  "keywords": [
+    "jumper",
+    "jumpy",
+    "cursor",
+    "block",
+    "jump",
+    "navigate",
+    "code"
+  ],
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:mario.moveUp",
+    "onCommand:mario.selectUp",
+    "onCommand:mario.moveDown",
+    "onCommand:mario.selectDown",
+    "onCommand:mario.moveToOuter",
+    "onCommand:mario.selectToOuter",
+    "onCommand:mario.moveDownToInner",
+    "onCommand:mario.selectDownToInner",
+    "onCommand:mario.moveUpToInner",
+    "onCommand:mario.selectUpToInner",
+    "onCommand:mario.nextQuote",
+    "onCommand:mario.selectNextQuote",
+    "onCommand:mario.previousQuote",
+    "onCommand:mario.selectPreviousQuote",
+    "onCommand:mario.nextComma",
+    "onCommand:mario.selectNextComma",
+    "onCommand:mario.previousComma",
+    "onCommand:mario.selectPreviousComma"
+  ],
+  "main": "./src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "mario.moveUp",
+        "title": "Mario: Move Up"
+      },
+      {
+        "command": "mario.selectUp",
+        "title": "Mario: Select Up"
+      },
+      {
+        "command": "mario.moveDown",
+        "title": "Mario: Move Down"
+      },
+      {
+        "command": "mario.selectDown",
+        "title": "Mario: Select Down"
+      },
+      {
+        "command": "mario.moveToOuter",
+        "title": "Mario: Move To Outer Block"
+      },
+      {
+        "command": "mario.selectToOuter",
+        "title": "Mario: Select To Outer Block"
+      },
+      {
+        "command": "mario.moveDownToInner",
+        "title": "Mario: Move Down To Inner"
+      },
+      {
+        "command": "mario.selectDownToInner",
+        "title": "Mario: Select Down To Inner"
+      },
+      {
+        "command": "mario.moveUpToInner",
+        "title": "Mario: Move Up To Inner"
+      },
+      {
+        "command": "mario.selectUpToInner",
+        "title": "Mario: Select Up To Inner"
+      },
+      {
+        "command": "mario.nextQuote",
+        "title": "Mario: Move To Next Quote"
+      },
+      {
+        "command": "mario.selectNextQuote",
+        "title": "Mario: Select To Next Quote"
+      },
+      {
+        "command": "mario.previousQuote",
+        "title": "Mario: Move To Previous Quote"
+      },
+      {
+        "command": "mario.selectPreviousQuote",
+        "title": "Mario: Select To Previous Quote"
+      },
+      {
+        "command": "mario.nextComma",
+        "title": "Mario: Move To Next Comma"
+      },
+      {
+        "command": "mario.selectNextComma",
+        "title": "Mario: Select To Next Comma"
+      },
+      {
+        "command": "mario.previousComma",
+        "title": "Mario: Move To Previous Comma"
+      },
+      {
+        "command": "mario.selectPreviousComma",
+        "title": "Mario: Select To Previous Comma"
+      }
     ],
-    "categories": [
-        "Other"
-    ],
-    "activationEvents": [
-        "onCommand:mario.moveUp",
-        "onCommand:mario.selectUp",
-        "onCommand:mario.moveDown",
-        "onCommand:mario.selectDown",
-        "onCommand:mario.moveToOuter",
-        "onCommand:mario.selectToOuter",
-        "onCommand:mario.moveDownToInner",
-        "onCommand:mario.selectDownToInner",
-        "onCommand:mario.moveUpToInner",
-        "onCommand:mario.selectUpToInner",
-        "onCommand:mario.nextQuote",
-        "onCommand:mario.selectNextQuote",
-        "onCommand:mario.previousQuote",
-        "onCommand:mario.selectPreviousQuote",
-        "onCommand:mario.nextComma",
-        "onCommand:mario.selectNextComma",
-        "onCommand:mario.previousComma",
-        "onCommand:mario.selectPreviousComma"
-    ],
-    "main": "./src/extension.js",
-    "contributes": {
-        "commands": [
-            {
-                "command": "mario.moveUp",
-                "title": "Mario: Move Up"
-            },
-            {
-                "command": "mario.selectUp",
-                "title": "Mario: Select Up"
-            },
-            {
-                "command": "mario.moveDown",
-                "title": "Mario: Move Down"
-            },
-            {
-                "command": "mario.selectDown",
-                "title": "Mario: Select Down"
-            },
-            {
-                "command": "mario.moveToOuter",
-                "title": "Mario: Move To Outer Block"
-            },
-            {
-                "command": "mario.selectToOuter",
-                "title": "Mario: Select To Outer Block"
-            },
-            {
-                "command": "mario.moveDownToInner",
-                "title": "Mario: Move Down To Inner"
-            },
-            {
-                "command": "mario.selectDownToInner",
-                "title": "Mario: Select Down To Inner"
-            },
-            {
-                "command": "mario.moveUpToInner",
-                "title": "Mario: Move Up To Inner"
-            },
-            {
-                "command": "mario.selectUpToInner",
-                "title": "Mario: Select Up To Inner"
-            },
-            {
-                "command": "mario.nextQuote",
-                "title": "Mario: Move To Next Quote"
-            },
-            {
-                "command": "mario.selectNextQuote",
-                "title": "Mario: Select To Next Quote"
-            },
-            {
-                "command": "mario.previousQuote",
-                "title": "Mario: Move To Previous Quote"
-            },
-            {
-                "command": "mario.selectPreviousQuote",
-                "title": "Mario: Select To Previous Quote"
-            },
-            {
-                "command": "mario.nextComma",
-                "title": "Mario: Move To Next Comma"
-            },
-            {
-                "command": "mario.selectNextComma",
-                "title": "Mario: Select To Next Comma"
-            },
-            {
-                "command": "mario.previousComma",
-                "title": "Mario: Move To Previous Comma"
-            },
-            {
-                "command": "mario.selectPreviousComma",
-                "title": "Mario: Select To Previous Comma"
-            }
-        ],
-        "keybindings": [
-            {
-                "key": "alt+z",
-                "command": "workbench.action.navigateBack"
-            },
-            {
-                "key": "alt+shift+z",
-                "command": "workbench.action.navigateForward"
-            },
-            {
-                "key": "alt+w",
-                "command": "mario.moveUp",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "alt+shift+w",
-                "command": "mario.selectUp",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "alt+s",
-                "command": "mario.moveDown",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "alt+shift+s",
-                "command": "mario.selectDown",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "alt+a",
-                "command": "mario.moveToOuter",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "alt+shift+a",
-                "command": "mario.selectToOuter",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "alt+d",
-                "command": "mario.moveDownToInner",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "alt+shift+d",
-                "command": "mario.selectDownToInner",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "alt+e",
-                "command": "mario.moveUpToInner",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "alt+shift+e",
-                "command": "mario.selectUpToInner",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "ctrl+w",
-                "command": "mario.moveUp",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+shift+w",
-                "command": "mario.selectUp",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+s",
-                "command": "mario.moveDown",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+shift+s",
-                "command": "mario.selectDown",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+a",
-                "command": "mario.moveToOuter",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+shift+a",
-                "command": "mario.selectToOuter",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+d",
-                "command": "mario.moveDownToInner",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+shift+d",
-                "command": "mario.selectDownToInner",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+e",
-                "command": "mario.moveUpToInner",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+shift+e",
-                "command": "mario.selectUpToInner",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+up",
-                "command": "mario.moveUp",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+shift+up",
-                "command": "mario.selectUp",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+down",
-                "command": "mario.moveDown",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+shift+down",
-                "command": "mario.selectDown",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+left",
-                "command": "mario.moveToOuter",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+shift+left",
-                "command": "mario.selectToOuter",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+right",
-                "command": "mario.moveDownToInner",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "ctrl+shift+right",
-                "command": "mario.selectDownToInner",
-                "when": "editorTextFocus && isMac"
-            },
-            {
-                "key": "alt+ctrl+up",
-                "command": "mario.moveUp",
-                "when": "editorTextFocus && !isMac"
-            },
-            {
-                "key": "alt+ctrl+shift+up",
-                "command": "mario.selectUp",
-                "when": "editorTextFocus && !isMac"
-            },
-            {
-                "key": "alt+ctrl+down",
-                "command": "mario.moveDown",
-                "when": "editorTextFocus && !isMac"
-            },
-            {
-                "key": "alt+ctrl+shift+down",
-                "command": "mario.selectDown",
-                "when": "editorTextFocus && !isMac"
-            },
-            {
-                "key": "alt+ctrl+left",
-                "command": "mario.moveToOuter",
-                "when": "editorTextFocus && !isMac"
-            },
-            {
-                "key": "alt+ctrl+shift+left",
-                "command": "mario.selectToOuter",
-                "when": "editorTextFocus && !isMac"
-            },
-            {
-                "key": "alt+ctrl+right",
-                "command": "mario.moveDownToInner",
-                "when": "editorTextFocus && !isMac"
-            },
-            {
-                "key": "alt+ctrl+shift+right",
-                "command": "mario.selectDownToInner",
-                "when": "editorTextFocus && !isMac"
-            },
-            {
-                "key": "alt+.",
-                "command": "mario.nextComma",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "alt+shift+.",
-                "command": "mario.selectNextComma",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "alt+,",
-                "command": "mario.previousComma",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "alt+shift+,",
-                "command": "mario.selectPreviousComma",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "alt+'",
-                "command": "mario.nextQuote",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "alt+shift+'",
-                "command": "mario.selectNextQuote",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "alt+;",
-                "command": "mario.previousQuote",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "alt+shift+;",
-                "command": "mario.selectPreviousQuote",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "ctrl+]",
-                "command": "mario.nextSpace",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "ctrl+shift+]",
-                "command": "mario.selectNextSpace",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "ctrl+[",
-                "command": "mario.previousSpace",
-                "when": "editorTextFocus"
-            },
-            {
-                "key": "ctrl+shift+[",
-                "command": "mario.selectPreviousSpace",
-                "when": "editorTextFocus"
-            }
-        ]
-    },
-    "scripts": {},
-    "devDependencies": {
-        "vscode": "^1.0.0"
-    },
-    "dependencies": {
-        "ovsx": "^0.7.1",
-        "vsce": "^2.15.0"
-    }
+    "keybindings": [
+      {
+        "key": "alt+z",
+        "command": "workbench.action.navigateBack"
+      },
+      {
+        "key": "alt+shift+z",
+        "command": "workbench.action.navigateForward"
+      },
+      {
+        "key": "alt+w",
+        "command": "mario.moveUp",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "alt+shift+w",
+        "command": "mario.selectUp",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "alt+s",
+        "command": "mario.moveDown",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "alt+shift+s",
+        "command": "mario.selectDown",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "alt+a",
+        "command": "mario.moveToOuter",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "alt+shift+a",
+        "command": "mario.selectToOuter",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "alt+d",
+        "command": "mario.moveDownToInner",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "alt+shift+d",
+        "command": "mario.selectDownToInner",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "alt+e",
+        "command": "mario.moveUpToInner",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "alt+shift+e",
+        "command": "mario.selectUpToInner",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+w",
+        "command": "mario.moveUp",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+shift+w",
+        "command": "mario.selectUp",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+s",
+        "command": "mario.moveDown",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+shift+s",
+        "command": "mario.selectDown",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+a",
+        "command": "mario.moveToOuter",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+shift+a",
+        "command": "mario.selectToOuter",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+d",
+        "command": "mario.moveDownToInner",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+shift+d",
+        "command": "mario.selectDownToInner",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+e",
+        "command": "mario.moveUpToInner",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+shift+e",
+        "command": "mario.selectUpToInner",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+up",
+        "command": "mario.moveUp",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+shift+up",
+        "command": "mario.selectUp",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+down",
+        "command": "mario.moveDown",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+shift+down",
+        "command": "mario.selectDown",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+left",
+        "command": "mario.moveToOuter",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+shift+left",
+        "command": "mario.selectToOuter",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+right",
+        "command": "mario.moveDownToInner",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "ctrl+shift+right",
+        "command": "mario.selectDownToInner",
+        "when": "editorTextFocus && isMac"
+      },
+      {
+        "key": "alt+ctrl+up",
+        "command": "mario.moveUp",
+        "when": "editorTextFocus && !isMac"
+      },
+      {
+        "key": "alt+ctrl+shift+up",
+        "command": "mario.selectUp",
+        "when": "editorTextFocus && !isMac"
+      },
+      {
+        "key": "alt+ctrl+down",
+        "command": "mario.moveDown",
+        "when": "editorTextFocus && !isMac"
+      },
+      {
+        "key": "alt+ctrl+shift+down",
+        "command": "mario.selectDown",
+        "when": "editorTextFocus && !isMac"
+      },
+      {
+        "key": "alt+ctrl+left",
+        "command": "mario.moveToOuter",
+        "when": "editorTextFocus && !isMac"
+      },
+      {
+        "key": "alt+ctrl+shift+left",
+        "command": "mario.selectToOuter",
+        "when": "editorTextFocus && !isMac"
+      },
+      {
+        "key": "alt+ctrl+right",
+        "command": "mario.moveDownToInner",
+        "when": "editorTextFocus && !isMac"
+      },
+      {
+        "key": "alt+ctrl+shift+right",
+        "command": "mario.selectDownToInner",
+        "when": "editorTextFocus && !isMac"
+      },
+      {
+        "key": "alt+.",
+        "command": "mario.nextComma",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "alt+shift+.",
+        "command": "mario.selectNextComma",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "alt+,",
+        "command": "mario.previousComma",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "alt+shift+,",
+        "command": "mario.selectPreviousComma",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "alt+'",
+        "command": "mario.nextQuote",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "alt+shift+'",
+        "command": "mario.selectNextQuote",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "alt+;",
+        "command": "mario.previousQuote",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "alt+shift+;",
+        "command": "mario.selectPreviousQuote",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+]",
+        "command": "mario.nextSpace",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+shift+]",
+        "command": "mario.selectNextSpace",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+[",
+        "command": "mario.previousSpace",
+        "when": "editorTextFocus"
+      },
+      {
+        "key": "ctrl+shift+[",
+        "command": "mario.selectPreviousSpace",
+        "when": "editorTextFocus"
+      }
+    ]
+  },
+  "scripts": {},
+  "devDependencies": {
+    "vscode": "^1.0.0"
+  },
+  "dependencies": {
+    "ovsx": "^0.7.1",
+    "vsce": "^2.15.0"
+  },
+  "bugs": {
+    "url": "https://github.com/jeff-hykin/mario-vsce/issues"
+  },
+  "homepage": "https://github.com/jeff-hykin/mario-vsce#readme",
+  "directories": {
+    "test": "tests"
+  },
+  "author": "",
+  "license": "ISC"
 }
