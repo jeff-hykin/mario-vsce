@@ -2,7 +2,7 @@
   "name": "mario",
   "displayName": "Mario: The Block Jumper Extension",
   "description": "Cursor movement for speedrunners and pros",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "icon": "icon.png",
   "publisher": "jeff-hykin",
   "repository": {
@@ -42,7 +42,11 @@
     "onCommand:mario.nextComma",
     "onCommand:mario.selectNextComma",
     "onCommand:mario.previousComma",
-    "onCommand:mario.selectPreviousComma"
+    "onCommand:mario.selectPreviousComma",
+    "onCommand:mario.nextSpace",
+    "onCommand:mario.selectNextSpace",
+    "onCommand:mario.previousSpace",
+    "onCommand:mario.selectPreviousSpace"
   ],
   "main": "./src/extension.js",
   "contributes": {
