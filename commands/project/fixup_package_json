@@ -1,0 +1,315 @@
+#!/usr/bin/env sh
+"\"",`$(echo --% ' |out-null)" >$null;function :{};function dv{<#${/*'>/dev/null )` 2>/dev/null;dv() { #>
+echo "1.31.3"; : --% ' |out-null <#';};v="$(dv)";d="$HOME/.deno/$v/bin/deno";if [ -x "$d" ];then exec "$d" run -q -A "$0" "$@";elif [ -f "$d" ];then chmod +x "$d" && exec "$d" run -q -A "$0" "$@";fi;bin_dir="$HOME/.deno/$v/bin";exe="$bin_dir/deno";has() { command -v "$1" >/dev/null; };if ! has unzip;then :;if ! has apt-get;then has brew && brew install unzip;else if [ "$(whoami)" = "root" ];then apt-get install unzip -y;elif has sudo;then echo "Can I install unzip for you? (its required for this command to work) ";read ANSWER;echo;if [ "$ANSWER" =~ ^[Yy] ];then sudo apt-get install unzip -y;fi;elif has doas;then echo "Can I install unzip for you? (its required for this command to work) ";read ANSWER;echo;if [ "$ANSWER" =~ ^[Yy] ];then doas apt-get install unzip -y;fi;fi;fi;fi;if ! has unzip;then echo "";echo "So I couldn't find an 'unzip' command";echo "And I tried to auto install it, but it seems that failed";echo "(This script needs unzip and either curl or wget)";echo "Please install the unzip command manually then re-run this script";exit 1;fi;if [ "$OS" = "Windows_NT" ];then target="x86_64-pc-windows-msvc";else :; case $(uname -sm) in "Darwin x86_64") target="x86_64-apple-darwin" ;; "Darwin arm64") target="aarch64-apple-darwin" ;; *) target="x86_64-unknown-linux-gnu" ;; esac;fi;deno_uri="https://github.com/denoland/deno/releases/download/v$v/deno-$target.zip";if [ ! -d "$bin_dir" ];then mkdir -p "$bin_dir";fi;if has curl;then curl --fail --location --progress-bar --output "$exe.zip" "$deno_uri";elif has wget;then wget --output-document="$exe.zip" "$deno_uri";else echo "Howdy! I looked for the 'curl' and for 'wget' commands but I didn't see either of them.";echo "Please install one of them";echo "Otherwise I have no way to install the missing deno version needed to run this code";fi;unzip -d "$bin_dir" -o "$exe.zip";chmod +x "$exe";rm "$exe.zip";exec "$d" run -q -A "$0" "$@"; #>}; $DenoInstall = "${HOME}/.deno/$(dv)"; $BinDir = "$DenoInstall/bin"; $DenoExe = "$BinDir/deno.exe"; if (-not(Test-Path -Path "$DenoExe" -PathType Leaf)) { $DenoZip = "$BinDir/deno.zip"; $DenoUri = "https://github.com/denoland/deno/releases/download/v$(dv)/deno-x86_64-pc-windows-msvc.zip"; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; if (!(Test-Path $BinDir)) { New-Item $BinDir -ItemType Directory | Out-Null; } Function Test-CommandExists { Param ($command); $oldPreference = $ErrorActionPreference; $ErrorActionPreference = "stop"; try {if(Get-Command "$command"){RETURN $true}} Catch {Write-Host "$command does not exist"; RETURN $false} Finally {$ErrorActionPreference=$oldPreference}; } if (Test-CommandExists curl) { curl -Lo $DenoZip $DenoUri; } else { curl.exe -Lo $DenoZip $DenoUri; } if (Test-CommandExists curl) { tar xf $DenoZip -C $BinDir; } else { tar.exe   xf $DenoZip -C $BinDir; } Remove-Item $DenoZip; $User = [EnvironmentVariableTarget]::User; $Path = [Environment]::GetEnvironmentVariable('Path', $User); if (!(";$Path;".ToLower() -like "*;$BinDir;*".ToLower())) { [Environment]::SetEnvironmentVariable('Path', "$Path;$BinDir", $User); $Env:Path += ";$BinDir"; } }; & "$DenoExe" run -q -A "$PSCommandPath" @args; Exit $LastExitCode; <#
+# */0}`;
+
+
+import { parse } from "https://deno.land/std@0.177.1/encoding/jsonc.ts"
+import { FileSystem } from "https://deno.land/x/quickr@0.6.28/main/file_system.js"
+
+const packageJsonPath = Deno.args[0] || `${FileSystem.thisFolder}/../../package.json` 
+const jsonText = await FileSystem.read(packageJsonPath)
+if (!jsonText) {
+    throw Error(`Tried to find a package.json, but couldn't find one. Looked at: ${packageJsonPath}`)
+}
+await FileSystem.write({
+    path: packageJsonPath,
+    data: JSON.stringify(
+        parse(jsonText),
+        0,
+        4,
+    ),
+})
+
+
+
+
+// // deno-fmt-ignore-file
+// // deno-lint-ignore-file
+// // This code was bundled using `deno bundle` and it's not recommended to edit it manually
+
+// class DenoStdInternalError extends Error {
+//     constructor(message) {
+//         super(message)
+//         this.name = "DenoStdInternalError"
+//     }
+// }
+// function assert(expr, msg = "") {
+//     if (!expr) {
+//         throw new DenoStdInternalError(msg)
+//     }
+// }
+// function parse(text, { allowTrailingComma = true } = {}) {
+//     if (new.target) {
+//         throw new TypeError("parse is not a constructor")
+//     }
+//     return new JSONCParser(text, {
+//         allowTrailingComma,
+//     }).parse()
+// }
+// var tokenType
+// ;(function (tokenType) {
+//     tokenType[(tokenType["beginObject"] = 0)] = "beginObject"
+//     tokenType[(tokenType["endObject"] = 1)] = "endObject"
+//     tokenType[(tokenType["beginArray"] = 2)] = "beginArray"
+//     tokenType[(tokenType["endArray"] = 3)] = "endArray"
+//     tokenType[(tokenType["nameSeparator"] = 4)] = "nameSeparator"
+//     tokenType[(tokenType["valueSeparator"] = 5)] = "valueSeparator"
+//     tokenType[(tokenType["nullOrTrueOrFalseOrNumber"] = 6)] = "nullOrTrueOrFalseOrNumber"
+//     tokenType[(tokenType["string"] = 7)] = "string"
+// })(tokenType || (tokenType = {}))
+// const originalJSONParse = globalThis.JSON.parse
+// class JSONCParser {
+//     #whitespace = new Set(" \t\r\n")
+//     #numberEndToken = new Set([..."[]{}:,/", ...this.#whitespace])
+//     #text
+//     #length
+//     #tokenized
+//     #options
+//     constructor(text, options) {
+//         this.#text = `${text}`
+//         this.#length = this.#text.length
+//         this.#tokenized = this.#tokenize()
+//         this.#options = options
+//     }
+//     parse() {
+//         const token = this.#getNext()
+//         const res = this.#parseJSONValue(token)
+//         const { done, value } = this.#tokenized.next()
+//         if (!done) {
+//             throw new SyntaxError(buildErrorMessage(value))
+//         }
+//         return res
+//     }
+//     #getNext() {
+//         const { done, value } = this.#tokenized.next()
+//         if (done) {
+//             throw new SyntaxError("Unexpected end of JSONC input")
+//         }
+//         return value
+//     }
+//     *#tokenize() {
+//         for (let i = 0; i < this.#length; i++) {
+//             if (this.#whitespace.has(this.#text[i])) {
+//                 continue
+//             }
+//             if (this.#text[i] === "/" && this.#text[i + 1] === "*") {
+//                 i += 2
+//                 let hasEndOfComment = false
+//                 for (; i < this.#length; i++) {
+//                     if (this.#text[i] === "*" && this.#text[i + 1] === "/") {
+//                         hasEndOfComment = true
+//                         break
+//                     }
+//                 }
+//                 if (!hasEndOfComment) {
+//                     throw new SyntaxError("Unexpected end of JSONC input")
+//                 }
+//                 i++
+//                 continue
+//             }
+//             if (this.#text[i] === "/" && this.#text[i + 1] === "/") {
+//                 i += 2
+//                 for (; i < this.#length; i++) {
+//                     if (this.#text[i] === "\n" || this.#text[i] === "\r") {
+//                         break
+//                     }
+//                 }
+//                 continue
+//             }
+//             switch (this.#text[i]) {
+//                 case "{":
+//                     yield {
+//                         type: tokenType.beginObject,
+//                         position: i,
+//                     }
+//                     break
+//                 case "}":
+//                     yield {
+//                         type: tokenType.endObject,
+//                         position: i,
+//                     }
+//                     break
+//                 case "[":
+//                     yield {
+//                         type: tokenType.beginArray,
+//                         position: i,
+//                     }
+//                     break
+//                 case "]":
+//                     yield {
+//                         type: tokenType.endArray,
+//                         position: i,
+//                     }
+//                     break
+//                 case ":":
+//                     yield {
+//                         type: tokenType.nameSeparator,
+//                         position: i,
+//                     }
+//                     break
+//                 case ",":
+//                     yield {
+//                         type: tokenType.valueSeparator,
+//                         position: i,
+//                     }
+//                     break
+//                 case '"': {
+//                     const startIndex = i
+//                     let shouldEscapeNext = false
+//                     i++
+//                     for (; i < this.#length; i++) {
+//                         if (this.#text[i] === '"' && !shouldEscapeNext) {
+//                             break
+//                         }
+//                         shouldEscapeNext = this.#text[i] === "\\" && !shouldEscapeNext
+//                     }
+//                     yield {
+//                         type: tokenType.string,
+//                         sourceText: this.#text.substring(startIndex, i + 1),
+//                         position: startIndex,
+//                     }
+//                     break
+//                 }
+//                 default: {
+//                     const startIndex = i
+//                     for (; i < this.#length; i++) {
+//                         if (this.#numberEndToken.has(this.#text[i])) {
+//                             break
+//                         }
+//                     }
+//                     i--
+//                     yield {
+//                         type: tokenType.nullOrTrueOrFalseOrNumber,
+//                         sourceText: this.#text.substring(startIndex, i + 1),
+//                         position: startIndex,
+//                     }
+//                 }
+//             }
+//         }
+//     }
+//     #parseJSONValue(value) {
+//         switch (value.type) {
+//             case tokenType.beginObject:
+//                 return this.#parseObject()
+//             case tokenType.beginArray:
+//                 return this.#parseArray()
+//             case tokenType.nullOrTrueOrFalseOrNumber:
+//                 return this.#parseNullOrTrueOrFalseOrNumber(value)
+//             case tokenType.string:
+//                 return this.#parseString(value)
+//             default:
+//                 throw new SyntaxError(buildErrorMessage(value))
+//         }
+//     }
+//     #parseObject() {
+//         const target = {}
+//         for (let isFirst = true; ; isFirst = false) {
+//             const token1 = this.#getNext()
+//             if ((isFirst || this.#options.allowTrailingComma) && token1.type === tokenType.endObject) {
+//                 return target
+//             }
+//             if (token1.type !== tokenType.string) {
+//                 throw new SyntaxError(buildErrorMessage(token1))
+//             }
+//             const key = this.#parseString(token1)
+//             const token2 = this.#getNext()
+//             if (token2.type !== tokenType.nameSeparator) {
+//                 throw new SyntaxError(buildErrorMessage(token2))
+//             }
+//             const token3 = this.#getNext()
+//             Object.defineProperty(target, key, {
+//                 value: this.#parseJSONValue(token3),
+//                 writable: true,
+//                 enumerable: true,
+//                 configurable: true,
+//             })
+//             const token4 = this.#getNext()
+//             if (token4.type === tokenType.endObject) {
+//                 return target
+//             }
+//             if (token4.type !== tokenType.valueSeparator) {
+//                 throw new SyntaxError(buildErrorMessage(token4))
+//             }
+//         }
+//     }
+//     #parseArray() {
+//         const target = []
+//         for (let isFirst = true; ; isFirst = false) {
+//             const token1 = this.#getNext()
+//             if ((isFirst || this.#options.allowTrailingComma) && token1.type === tokenType.endArray) {
+//                 return target
+//             }
+//             target.push(this.#parseJSONValue(token1))
+//             const token2 = this.#getNext()
+//             if (token2.type === tokenType.endArray) {
+//                 return target
+//             }
+//             if (token2.type !== tokenType.valueSeparator) {
+//                 throw new SyntaxError(buildErrorMessage(token2))
+//             }
+//         }
+//     }
+//     #parseString(value) {
+//         let parsed
+//         try {
+//             parsed = originalJSONParse(value.sourceText)
+//         } catch {
+//             throw new SyntaxError(buildErrorMessage(value))
+//         }
+//         assert(typeof parsed === "string")
+//         return parsed
+//     }
+//     #parseNullOrTrueOrFalseOrNumber(value) {
+//         if (value.sourceText === "null") {
+//             return null
+//         }
+//         if (value.sourceText === "true") {
+//             return true
+//         }
+//         if (value.sourceText === "false") {
+//             return false
+//         }
+//         let parsed
+//         try {
+//             parsed = originalJSONParse(value.sourceText)
+//         } catch {
+//             throw new SyntaxError(buildErrorMessage(value))
+//         }
+//         assert(typeof parsed === "number")
+//         return parsed
+//     }
+// }
+// function buildErrorMessage({ type, sourceText, position }) {
+//     let token = ""
+//     switch (type) {
+//         case tokenType.beginObject:
+//             token = "{"
+//             break
+//         case tokenType.endObject:
+//             token = "}"
+//             break
+//         case tokenType.beginArray:
+//             token = "["
+//             break
+//         case tokenType.endArray:
+//             token = "]"
+//             break
+//         case tokenType.nameSeparator:
+//             token = ":"
+//             break
+//         case tokenType.valueSeparator:
+//             token = ","
+//             break
+//         case tokenType.nullOrTrueOrFalseOrNumber:
+//         case tokenType.string:
+//             token = 30 < sourceText.length ? `${sourceText.slice(0, 30)}...` : sourceText
+//             break
+//         default:
+//             throw new Error("unreachable")
+//     }
+//     return `Unexpected token ${token} in JSONC at position ${position}`
+// }
+
+
+// (this comment is part of deno-guillotine, dont remove) #>

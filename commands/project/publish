@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 
-npx vsce publish --pat "$1" && echo "published on VSCE"
-npx ovsx publish -p "$2" && echo "published on OVSX"
+./fixup_package_json
+vsce publish --pat "$1" && echo "published on VSCE"
+ovsx publish -p "$2" && echo "published on OVSX"
