@@ -1,5 +1,5 @@
-let readline = require("readline")
-let vscode = require("vscode")
+const vscode = require("vscode")
+const packageJson = require("../package.json")
 
 const status = {
     spaceMode: false,
@@ -431,9 +431,9 @@ function findNext({pattern, goBackwards=false, startingCharacterIndex=null, star
         if (matches.length == 0) {
             continue
         }
-        // if on different lines, then any match will do (characterIndex doesn't matter)
+        // if on different lines, then any match will do (dont need to figure out if characterIndex is in-front or behind)
         if (lineIndex != cursorLineIndex) {
-            characterIndex = eachMatch.index
+            characterIndex = matches[0].index
             break mainLoop
         }
         // if on the same line, then it depends
@@ -512,8 +512,45 @@ function findNext({pattern, goBackwards=false, startingCharacterIndex=null, star
             }
         }
     }
-    
     return {characterIndex, lineIndex}
+}
+
+/**
+ * return new position after lineUp/lineDown
+ *
+ * @param arg1.numberOfLines - negative means go up
+ * @returns output.characterIndex 
+ * @returns output.lineIndex
+ *
+ */
+function goDown({numberOfLines, startingCharacterIndex=null, startingLineIndex=null, selection=null}) {
+    // process args
+    if (selection == null) { selection = vscode.window.activeTextEditor.selection }
+    const cursorCharacterIndex = startingCharacterIndex == null ? selection.active.character : startingCharacterIndex
+    const cursorLineIndex      = startingLineIndex      == null ? selection.active.line      : startingLineIndex
+    
+    // setup
+    const editor = vscode.window.activeTextEditor
+    
+    while (1) {
+        const targetLineIndex = cursorLineIndex + numberOfLines
+        try {
+            // if the line exists
+            const lineContent = activeFile.lineAt(targetLineIndex).text
+            // try to preserve char index but dont force it
+            return {
+                characterIndex: Math.min(lineContent.length, cursorCharacterIndex),
+                lineIndex: targetLineIndex
+            }
+        } catch (error) {
+            // make number of lines closer to zero
+            if (numberOfLines > 0) {
+                numberOfLines -= 1
+            } else {
+                numberOfLines += 1
+            }
+        }
+    }
 }
 
 vscode.keybindingManager = vscode.keybindingManager || {}
@@ -577,7 +614,15 @@ module.exports = {
 
         const newCommand = ({name, command}) => {
             console.log(`creating command: ${name}`)
-            context.subscriptions.push(vscode.commands.registerCommand("mario."+name, command))
+            const commandId = "mario."+name
+            context.subscriptions.push(vscode.commands.registerCommand(commandId, command))
+            // sanity checks: if its not in the package json
+            if (!packageJson.contributes.commands.some(({command})=>command === commandId)) {
+                console.error(`\n\nYou forgot to add ${commandId} to the packageJson under "contributes": { "commands": [] }`,)
+            }
+            if (!packageJson.activationEvents.some(commandString=>commandString===`onCommand:${commandId}`)) {
+                console.error(`\n\nYou forgot to add ${commandId} to the packageJson under "activationEvents": [ ${JSON.stringify(`onCommand:${commandId}`)} ]`,)
+            }
         }
         
         newCommand({       name:"moveUp"           , command: ()=>cursorJumpBlock({ direction: "up",                                })       })
@@ -590,8 +635,8 @@ module.exports = {
         newCommand({       name:"selectUpToInner"  , command: ()=>cursorJumpBlock({ direction: "rightUp",   shouldSelectRange:true, })       })
         newCommand({       name:"moveDownToInner"  , command: ()=>cursorJumpBlock({ direction: "rightDown",                         })       })
         newCommand({       name:"selectDownToInner", command: ()=>cursorJumpBlock({ direction: "rightDown", shouldSelectRange:true, })       })
-        newCommand({       name:"spaceMode"        , command: ()=>{ status.spaceMode = true      ; console.log("activatingSpaceMode") }  }) // NOTE: part of unfinished feature
-        newCommand({       name:"spaceSelectMode"  , command: ()=>{ status.spaceSelectMode = true; console.log("activatingSpaceMode") }  }) // NOTE: part of unfinished feature
+        // newCommand({       name:"spaceMode"        , command: ()=>{ status.spaceMode = true      ; console.log("activatingSpaceMode") }  }) // NOTE: part of unfinished feature
+        // newCommand({       name:"spaceSelectMode"  , command: ()=>{ status.spaceSelectMode = true; console.log("activatingSpaceMode") }  }) // NOTE: part of unfinished feature
         
         function nextFinder(name, pattern) {
             const genericFindNextFunction = ({ goBackwards, shouldSelectRange }) => {
@@ -612,10 +657,29 @@ module.exports = {
         nextFinder("Quote", /"|'|`/) // TODO: make quote know which quote it is matching (when finding more quotes in a selection)
         nextFinder("Comma", /,/)
         nextFinder("Space", / +|\t+|\n|\r|$|^/)
+        nextFinder("Wordlike", /[a-zA-Z0-9][a-zA-Z0-9\.:,]*/)
+        
+        newCommand({
+            name: `lineDown`,
+            command: ({numberOfLines, andSelectRange=false})=>{
+                try {
+                    changeCursorSelections({
+                        shouldSelectRange: andSelectRange,
+                        newCursorRanges: vscode.window.activeTextEditor.selections.map(
+                            eachSelection => goDown({
+                                numberOfLines: numberOfLines||1,
+                                selection: eachSelection,
+                            })
+                        ),
+                    })
+                } catch (error) {
+                    console.debug(`mario.${name} error is:`,error)
+                }
+            },
+        })
     },
 
     deactivate() {
 
     }
 }
-

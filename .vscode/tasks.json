@@ -6,6 +6,14 @@
         {
             "label": "Run Package.json Fixer",
             "type": "shell",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
             "command": "${workspaceFolder}/commands/project/fixup_package_json",
             "windows": {
                 "command": "pwsh ${workspaceFolder}/commands/project/fixup_package_json"

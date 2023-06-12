@@ -25,6 +25,7 @@
         "Other"
     ],
     "activationEvents": [
+        "onCommand:mario.lineDown",
         "onCommand:mario.moveUp",
         "onCommand:mario.selectUp",
         "onCommand:mario.moveDown",
@@ -56,11 +57,8 @@
     "contributes": {
         "commands": [
             {
-                "args": {
-                    "text": "testing args"
-                },
                 "command": "mario.lineDown",
-                "title": "Mario: Line Down 1"
+                "title": "Mario: Line Down"
             },
             {
                 "command": "mario.moveUp",
@@ -119,6 +117,38 @@
                 "title": "Mario: Select To Previous Quote"
             },
             {
+                "command": "mario.nextSpace",
+                "title": "Mario: Move To Next Space"
+            },
+            {
+                "command": "mario.selectNextSpace",
+                "title": "Mario: Select To Next Space"
+            },
+            {
+                "command": "mario.previousSpace",
+                "title": "Mario: Move To Previous Space"
+            },
+            {
+                "command": "mario.selectPreviousSpace",
+                "title": "Mario: Select To Previous Space"
+            },
+            {
+                "command": "mario.nextWordlike",
+                "title": "Mario: Move To Next Wordlike"
+            },
+            {
+                "command": "mario.selectNextWordlike",
+                "title": "Mario: Select To Next Wordlike"
+            },
+            {
+                "command": "mario.previousWordlike",
+                "title": "Mario: Move To Previous Wordlike"
+            },
+            {
+                "command": "mario.selectPreviousWordlike",
+                "title": "Mario: Select To Previous Wordlike"
+            },
+            {
                 "command": "mario.nextComma",
                 "title": "Mario: Move To Next Comma"
             },
@@ -136,6 +166,78 @@
             }
         ],
         "keybindings": [
+            {
+                "args": {
+                    "numberOfLines": -1,
+                    "andSelectRange": false
+                },
+                "key": "ctrl+k",
+                "command": "mario.lineDown",
+                "when": "editorTextFocus"
+            },
+            {
+                "args": {
+                    "numberOfLines": 1,
+                    "andSelectRange": false
+                },
+                "key": "ctrl+j",
+                "command": "mario.lineDown",
+                "when": "editorTextFocus"
+            },
+            {
+                "args": {
+                    "numberOfLines": -5,
+                    "andSelectRange": false
+                },
+                "key": "ctrl+u",
+                "command": "mario.lineDown",
+                "when": "editorTextFocus"
+            },
+            {
+                "args": {
+                    "numberOfLines": 5,
+                    "andSelectRange": false
+                },
+                "key": "ctrl+n",
+                "command": "mario.lineDown",
+                "when": "editorTextFocus"
+            },
+            {
+                "args": {
+                    "numberOfLines": -1,
+                    "andSelectRange": true
+                },
+                "key": "ctrl+shift+k",
+                "command": "mario.lineDown",
+                "when": "editorTextFocus"
+            },
+            {
+                "args": {
+                    "numberOfLines": 1,
+                    "andSelectRange": true
+                },
+                "key": "ctrl+shift+j",
+                "command": "mario.lineDown",
+                "when": "editorTextFocus"
+            },
+            {
+                "args": {
+                    "numberOfLines": -5,
+                    "andSelectRange": true
+                },
+                "key": "ctrl+shift+u",
+                "command": "mario.lineDown",
+                "when": "editorTextFocus"
+            },
+            {
+                "args": {
+                    "numberOfLines": 5,
+                    "andSelectRange": true
+                },
+                "key": "ctrl+shift+n",
+                "command": "mario.lineDown",
+                "when": "editorTextFocus"
+            },
             {
                 "key": "alt+z",
                 "command": "workbench.action.navigateBack"
@@ -377,14 +479,6 @@
             {
                 "key": "ctrl+[",
                 "command": "mario.previousSpace",
-                "when": "editorTextFocus"
-            },
-            {
-                "args": {
-                    "numberOfLines": 1
-                },
-                "key": "ctrl+alt+[",
-                "command": "mario.lineDown",
                 "when": "editorTextFocus"
             },
             {

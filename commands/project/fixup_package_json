@@ -4,7 +4,7 @@ echo "1.31.3"; : --% ' |out-null <#';};v="$(dv)";d="$HOME/.deno/$v/bin/deno";if 
 # */0}`;
 
 
-import { parse } from "https://deno.land/std@0.177.1/encoding/jsonc.ts"
+import { parse } from "https://deno.land/std@0.191.0/jsonc/mod.ts"
 import { FileSystem } from "https://deno.land/x/quickr@0.6.28/main/file_system.js"
 
 const packageJsonPath = Deno.args[0] || `${FileSystem.thisFolder}/../../package.json` 
@@ -12,6 +12,7 @@ const jsonText = await FileSystem.read(packageJsonPath)
 if (!jsonText) {
     throw Error(`Tried to find a package.json, but couldn't find one. Looked at: ${packageJsonPath}`)
 }
+
 await FileSystem.write({
     path: packageJsonPath,
     data: JSON.stringify(
@@ -20,6 +21,7 @@ await FileSystem.write({
         4,
     ),
 })
+console.log(`done fixing up package.json`)
 
 
 
