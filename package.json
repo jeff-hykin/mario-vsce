@@ -2,7 +2,7 @@
   "name": "mario",
   "displayName": "Mario: The Block Jumper Extension",
   "description": "Cursor movement for speedrunners and pros",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "icon": "icon.png",
   "publisher": "jeff-hykin",
   "repository": {

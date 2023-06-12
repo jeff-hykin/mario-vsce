@@ -611,7 +611,7 @@ module.exports = {
             
         nextFinder("Quote", /"|'|`/) // TODO: make quote know which quote it is matching (when finding more quotes in a selection)
         nextFinder("Comma", /,/)
-        nextFinder("Space", / |\t|\n|\r|$|^/)
+        nextFinder("Space", / +|\t+|\n|\r|$|^/)
     },
 
     deactivate() {
