@@ -1,6 +1,7 @@
 const vscode = require("vscode")
 const packageJson = require("../package.json")
 
+const window = vscode.window
 const status = {
     spaceMode: false,
     spaceSelectMode: false,
@@ -608,6 +609,7 @@ const keypressListener = (arg)=> {
 
 module.exports = {
     activate(context) {
+        console.log(`activating Mario`)
         // NOTE: this commented out part was designed to be a multi-key shortcut solution (or a hack for chorded keyboard shortcuts) but it is unfinished
         // vscode.keybindingManager.setup(context)
         // vscode.keybindingManager.listeners.add(keypressListener)
@@ -620,9 +622,9 @@ module.exports = {
             if (!packageJson.contributes.commands.some(({command})=>command === commandId)) {
                 console.error(`\n\nYou forgot to add ${commandId} to the packageJson under "contributes": { "commands": [] }`,)
             }
-            if (!packageJson.activationEvents.some(commandString=>commandString===`onCommand:${commandId}`)) {
-                console.error(`\n\nYou forgot to add ${commandId} to the packageJson under "activationEvents": [ ${JSON.stringify(`onCommand:${commandId}`)} ]`,)
-            }
+            // if (!packageJson.activationEvents.some(commandString=>commandString===`onCommand:${commandId}`)) {
+            //     console.error(`\n\nYou forgot to add ${commandId} to the packageJson under "activationEvents": [ ${JSON.stringify(`onCommand:${commandId}`)} ]`,)
+            // }
         }
         
         newCommand({       name:"moveUp"           , command: ()=>cursorJumpBlock({ direction: "up",                                })       })
@@ -677,6 +679,156 @@ module.exports = {
                 }
             },
         })
+        
+        // 
+        // harpoon (basically)
+        // 
+            const pinnedEditors = {}
+            const touchPin = (pin)=>{
+                for (const [key, value] of Object.entries(pinnedEditors)) {
+                    value.touchOrder+=1
+                }
+                pin.touchOrder = 0
+            }
+            function goTo(line, editor, indent=0) {
+                const activeCursor = editor.selection.active.with(line, indent)
+                editor.revealRange(new vscode.Range(activeCursor, activeCursor))
+                editor.selection = new vscode.Selection(activeCursor, activeCursor )
+            }
+            const jumpToPin = (pin, {touch=true})=>{
+                return vscode.workspace.openTextDocument(pin.filePath).catch(err=>{
+                    window.showErrorMessage(`Couldn't find that file, was it renamed/deleted?`)
+                }).then((document)=>vscode.window.showTextDocument(document)).then(editor=>{
+                    if (touch) {
+                        touchPin(pin)
+                    }
+                    return goTo(pin.lineNumber, editor, pin.indent)
+                })
+            }
+            
+            newCommand({name:"pin", command: ()=>{
+                const editor = vscode?.window?.activeTextEditor;
+                const filePath = editor?.document?.fileName
+                const lineNumber = editor?.selection?.active?.line
+                const line = lineNumber!=null?vscode.window.activeTextEditor.document.lineAt(lineNumber).text : null
+                const indent = line.length - line.trimStart().length
+                const id = `${filePath}:${lineNumber}`
+                pinnedEditors[id] = {
+                    filePath,
+                    lineNumber,
+                    indent,
+                    line: line.trim(),
+                    touchOrder: 0,
+                }
+                touchPin(pinnedEditors[id])
+            }})
+            newCommand({name:"unpinAll", command: ()=>{
+                for (const [key, value] of Object.entries(pinnedEditors)) {
+                    delete pinnedEditors[key]
+                }
+            }})
+            newCommand({name:"unpin", command: async ()=>{
+                const result = await window.showQuickPick(Object.keys(pinnedEditors))
+                delete pinnedEditors[result]
+            }})
+            newCommand({name:"jumpToPin", command: async ()=>{
+                function removeCommonPrefix(listOfStrings) {
+                    function allEqual(aList) {
+                        if (aList.length === 0) {
+                            return true
+                        }
+
+                        let prev = aList[0]
+                        for (let i = 0; i < aList.length; i++) {
+                            if (prev !== aList[i]) {
+                                return false
+                            }
+                            prev = aList[i]
+                        }
+
+                        return true
+                    }
+
+                    const shortestPathLength = Math.min(...listOfStrings.map((eachPath) => eachPath.length))
+                    let longestCommonPathLength = shortestPathLength
+                    while (longestCommonPathLength > 0) {
+                        if (allEqual(listOfStrings.map((each) => each.substring(0, longestCommonPathLength)))) {
+                            break
+                        }
+                        longestCommonPathLength--
+                    }
+
+                    return listOfStrings.map((each) => each.substring(longestCommonPathLength))
+                }
+                let pinnedKeys = Object.keys(pinnedEditors).map(each=>`${each}:\t${pinnedEditors[each].line}`)
+                let prefix = ""
+                if (pinnedKeys.length > 0) {
+                    const pathDirs = pinnedKeys.map(each=>each.split(/:/)[0].split(/\/|\\/g).slice(0,-1).join("/"))
+                    const pathLengthBefore = pathDirs[0].length
+                    const lengthAfter = removeCommonPrefix(pathDirs)[0].length
+                    prefix = pinnedKeys[0].slice(0,(pathLengthBefore-lengthAfter))
+                    pinnedKeys = pinnedKeys.map(each=>each.slice(prefix.length,))
+                }
+                const result = await window.showQuickPick(pinnedKeys)
+                if (result) {
+                    const id =  prefix + result.split(/:/g).slice(0,2).join(":")
+                    const pin = pinnedEditors[id]
+                    return jumpToPin(pin, {}) || window.showWarningMessage(`I couldn't find that`)
+                }
+            }})
+            vscode.window.onDidChangeTextEditorSelection((editor) => {
+                // NOTE: there could be a problem here if this callback significantly lags behind while a user pressed "next" "next" "next"
+                const filePath = vscode.window.activeTextEditor?.document?.fileName
+                const lineNumber = vscode.window.activeTextEditor?.selection?.active?.line
+                const id = `${filePath}:${lineNumber}`
+                const pin = pinnedEditors[id]
+                if (pin) {
+                    touchPin(pin)
+                }
+            })
+            const wrapAroundGet = (number, list) => list[((number % list.length) + list.length) % list.length]
+            const cycleResetTime = 1500 // miliseconds
+            let resetter
+            let pinsOrdered
+            let distance
+            const forwards = 1
+            const backwards = -1
+            const cycle = (direction)=>{
+                // if already on a pin, exclude it
+                const filePath = vscode.window?.activeTextEditor?.document?.fileName
+                const lineNumber = vscode.window?.activeTextEditor?.selection?.active?.line
+                const id = `${filePath}:${lineNumber}`
+                
+                resetter && clearInterval(resetter)
+                if (!pinsOrdered) {
+                    if (direction == forwards) {
+                        distance = 0
+                    } else {
+                        distance = -1
+                    }
+                    pinsOrdered = Object.entries(pinnedEditors)
+                        .filter(([eachId,eachPin])=>eachId!=id)
+                        .map(each=>each[1])
+                        .sort((a,b)=>a.touchOrder-b.touchOrder)
+                    
+                } else {
+                    distance += direction
+                }
+                resetter = setTimeout(()=>{
+                    resetter = null
+                    distance = 0
+                    pinsOrdered = null
+                }, cycleResetTime)
+                
+                const whichPin = wrapAroundGet(distance, pinsOrdered)
+                return jumpToPin(whichPin, {touch: false})
+            }
+            newCommand({name:"nextPin", command: ()=>{
+                cycle(forwards)
+            }})
+            newCommand({name:"prevPin", command: ()=>{
+                cycle(backwards)
+            }})
     },
 
     deactivate() {

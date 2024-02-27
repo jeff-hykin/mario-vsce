@@ -25,6 +25,7 @@
         "Other"
     ],
     "activationEvents": [
+        "*",
         "onCommand:mario.lineDown",
         "onCommand:mario.moveUp",
         "onCommand:mario.selectUp",
@@ -163,6 +164,30 @@
             {
                 "command": "mario.selectPreviousComma",
                 "title": "Mario: Select To Previous Comma"
+            },
+            {
+                "command": "mario.unpin",
+                "title": "Mario: UnPin A Spot (Dropdown)"
+            },
+            {
+                "command": "mario.unpinAll",
+                "title": "Mario: UnPin All Pins"
+            },
+            {
+                "command": "mario.nextPin",
+                "title": "Mario: Cycle to Next Pin"
+            },
+            {
+                "command": "mario.prevPin",
+                "title": "Mario: Cycle to Prev Pin"
+            },
+            {
+                "command": "mario.jumpToPin",
+                "title": "Mario: Jump to Pin (list)"
+            },
+            {
+                "command": "mario.pin",
+                "title": "Mario: Pin A Spot"
             }
         ],
         "keybindings": [
